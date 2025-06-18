@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>週次レポート - {{report_date}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .positive { color: green; }
+        .negative { color: red; }
+        .summary-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h1>週次レポート - {{report_date}}</h1>
+    
+    <div class="summary-box">
+        <h3>📊 今週のハイライト</h3>
+        <ul>
+            <li>総売上: ¥{{total_sales}}</li>
+            <li>前年同期比: {{yoy_change}}%</li>
+            <li>前週比: {{weekly_change}}%</li>
+            <li>監視銘柄数: {{stock_count}}</li>
+            <li>業界ニュース: {{news_count}}件</li>
+        </ul>
+    </div>
+
+    <h2>💰 売上サマリー</h2>
+    {{sales_table}}
+
+    <h2>📈 株価情報</h2>
+    {{stock_table}}
+
+    <h2>📰 業界ニュース</h2>
+    {{news_list}}
+
+    <h2>📅 今週のスケジュール</h2>
+    {{schedule_list}}
+
+    <div class="footer">
+        <hr>
+        <p><em>このレポートは自動生成されました - {{generation_timestamp}}</em></p>
+        <p>データソース: 売上データ（CSV）、Alpha Vantage API、NewsAPI、Outlook</p>
+    </div>
+</body>
+</html> 

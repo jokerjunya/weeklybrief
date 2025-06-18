@@ -1,0 +1,56 @@
+{
+  "sample_sales_data": [
+    {
+      "date": "2024-01-15",
+      "product": "Product A",
+      "sales": 150000,
+      "units": 50
+    },
+    {
+      "date": "2024-01-16", 
+      "product": "Product B",
+      "sales": 200000,
+      "units": 75
+    }
+  ],
+  "sample_stock_data": {
+    "AAPL": {
+      "current_price": 150.25,
+      "change": 2.34,
+      "change_percent": 1.58
+    },
+    "GOOGL": {
+      "current_price": 2750.80,
+      "change": -15.20,
+      "change_percent": -0.55
+    }
+  },
+  "sample_news_data": [
+    {
+      "title": "OpenAI releases new model",
+      "description": "Latest AI model shows significant improvements",
+      "url": "https://example.com/news1",
+      "published_at": "2024-01-15T10:00:00Z",
+      "keyword": "OpenAI"
+    },
+    {
+      "title": "Anthropic announces Claude updates",
+      "description": "Enhanced reasoning capabilities in latest release",
+      "url": "https://example.com/news2", 
+      "published_at": "2024-01-14T15:30:00Z",
+      "keyword": "Anthropic"
+    }
+  ],
+  "sample_schedule_data": [
+    {
+      "subject": "月曜定例会議",
+      "start": "2024-01-15T09:00:00Z",
+      "end": "2024-01-15T10:00:00Z"
+    },
+    {
+      "subject": "プロジェクトレビュー",
+      "start": "2024-01-17T14:00:00Z", 
+      "end": "2024-01-17T15:30:00Z"
+    }
+  ]
+} 

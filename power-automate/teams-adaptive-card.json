@@ -1,0 +1,67 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "週次レポートが作成されました",
+      "weight": "Bolder",
+      "size": "Medium"
+    },
+    {
+      "type": "TextBlock",
+      "text": "レポートの内容を確認し、問題がなければ「承認」ボタンを押してください。",
+      "wrap": true,
+      "spacing": "Medium"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "レポート日付:",
+          "value": "{{report_date}}"
+        },
+        {
+          "title": "生成時刻:",
+          "value": "{{generation_time}}"
+        },
+        {
+          "title": "データソース:",
+          "value": "売上データ、株価データ、ニュース、スケジュール"
+        }
+      ]
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.OpenUrl",
+          "title": "レポートを確認",
+          "url": "{{report_url}}"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "承認してTeamsに投稿",
+      "data": {
+        "action": "approve",
+        "report_url": "{{report_url}}",
+        "report_date": "{{report_date}}"
+      },
+      "style": "positive"
+    },
+    {
+      "type": "Action.Submit", 
+      "title": "後で確認",
+      "data": {
+        "action": "postpone",
+        "report_url": "{{report_url}}",
+        "report_date": "{{report_date}}"
+      }
+    }
+  ]
+} 
