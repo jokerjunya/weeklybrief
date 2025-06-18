@@ -109,10 +109,14 @@ class WeeklyReportProcessor:
     
     def fetch_news_data(self, keywords: List[str]) -> List[Dict[str, Any]]:
         """
-        ニュースデータを取得・処理
+        ニュースデータを取得・処理（過去1週間以内）
         """
         api_key = self.config["data_sources"]["news_data"]["api_key"]
         all_articles = []
+        
+        # 過去1週間の日付を計算
+        from datetime import datetime, timedelta
+        one_week_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
         
         for keyword in keywords:
             try:
@@ -122,7 +126,8 @@ class WeeklyReportProcessor:
                     "apiKey": api_key,
                     "language": "en",
                     "sortBy": "publishedAt",
-                    "pageSize": 5
+                    "pageSize": 5,
+                    "from": one_week_ago  # 過去1週間以内のニュースのみ
                 }
                 response = requests.get(url, params=params)
                 data = response.json()
