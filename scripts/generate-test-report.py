@@ -82,16 +82,6 @@ def generate_test_report():
     # レポート内容生成
     report_content = f"""# 週次レポート - {report_date}
 
-## 📊 今週のハイライト
-
-- **Online Platform売上**: ¥{online_platform['current_value']:,}
-- **Online Platform前年同期比**: {online_platform['yoy_change']:+.1f}%
-- **Placement内定数**: {placement['current_value']:,}件
-- **監視銘柄**: {len(valid_stocks)}銘柄
-- **業界ニュース**: {len(news_data)}件
-
----
-
 ## 💼 ビジネス実績
 
 | サービス名 | 指標 | 今週実績 | 前年同期比 | 前週比 |
