@@ -22,9 +22,9 @@
     "stock_data": {
       "api_key": "L5VIGOU04YJW64BT",
       "url": "https://www.alphavantage.co/query",
-      "tickers": ["EWJ", "SPY", "RCRUY"],
+      "tickers": ["N225", "SPY", "RCRUY"],
       "ticker_names": {
-        "EWJ": "日本株ETF (iShares MSCI Japan)",
+        "N225": "日経平均株価",
         "SPY": "S&P 500 ETF",
         "RCRUY": "リクルートホールディングス (ADR)"
       }
