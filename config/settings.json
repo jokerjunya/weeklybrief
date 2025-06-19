@@ -38,6 +38,14 @@
       "source": "Outlook",
       "date_range": "current_week"
     },
+    "local_llm": {
+      "enabled": true,
+      "ollama_url": "http://localhost:11434",
+      "model_name": "qwen3:30b-a3b",
+      "thinking_mode": false,
+      "timeout": 30,
+      "max_tokens": 100
+    },
     "ai_summarization": {
       "openai": {
         "api_key": "OPENAI_API_KEY_TO_BE_PROVIDED",
