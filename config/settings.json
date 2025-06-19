@@ -20,36 +20,39 @@
       }
     },
     "stock_data": {
-      "api_provider": "Alpha Vantage",
       "api_key": "L5VIGOU04YJW64BT",
+      "url": "https://www.alphavantage.co/query",
       "tickers": ["AAPL", "GOOGL", "MSFT"],
       "ticker_names": {
         "AAPL": "Apple Inc.",
-        "GOOGL": "Alphabet Inc.", 
+        "GOOGL": "Alphabet Inc.",
         "MSFT": "Microsoft Corp."
-      },
-      "function": "TIME_SERIES_DAILY"
+      }
     },
     "news_data": {
-      "api_provider": "NewsAPI",
       "api_key": "5d88b85486d641faba9a410aca9c138b",
-      "keywords": [
-        "Gemini",
-        "OpenAI", 
-        "Genspark",
-        "Anthropic",
-        "ElevenLabs",
-        "Perplexity",
-        "Grok",
-        "Lovable"
-      ],
-      "max_articles_per_keyword": 5,
-      "language": "en",
-      "sort_by": "publishedAt"
+      "url": "https://newsapi.org/v2/everything",
+      "keywords": ["Gemini", "OpenAI", "Genspark", "Anthropic", "ElevenLabs", "Perplexity", "Grok", "Lovable"]
     },
     "calendar_data": {
       "source": "Outlook",
       "date_range": "current_week"
+    },
+    "ai_summarization": {
+      "openai": {
+        "api_key": "OPENAI_API_KEY_TO_BE_PROVIDED",
+        "model": "gpt-4o-mini",
+        "max_tokens": 150,
+        "temperature": 0.3,
+        "base_url": "https://api.openai.com/v1"
+      },
+      "google_translate": {
+        "api_key": "GOOGLE_TRANSLATE_API_KEY_TO_BE_PROVIDED",
+        "base_url": "https://translation.googleapis.com/language/translate/v2"
+      },
+      "enabled": true,
+      "provider": "openai",
+      "fallback_enabled": true
     }
   },
   "output": {
@@ -67,5 +70,14 @@
     "retry_count": 3,
     "retry_interval_minutes": 10,
     "notification_email": "TO_BE_PROVIDED"
+  },
+  "report_settings": {
+    "output_format": "markdown",
+    "include_charts": false,
+    "language": "ja"
+  },
+  "power_automate": {
+    "teams_chat_id": "TEAMS_CHAT_ID_TO_BE_PROVIDED",
+    "webhook_url": "WEBHOOK_URL_TO_BE_PROVIDED"
   }
 } 

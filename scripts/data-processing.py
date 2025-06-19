@@ -9,11 +9,14 @@ import pandas as pd
 from datetime import datetime, timedelta
 import requests
 from typing import Dict, List, Any
+from news_summarizer import NewsSummarizer
 
 class WeeklyReportProcessor:
     def __init__(self, config_path: str = "config/settings.json"):
         with open(config_path, 'r', encoding='utf-8') as f:
             self.config = json.load(f)
+        # ニュース要約機能を初期化
+        self.news_summarizer = NewsSummarizer(config_path)
     
     def process_sales_data(self, csv_file_path: str) -> Dict[str, Any]:
         """
@@ -144,9 +147,14 @@ class WeeklyReportProcessor:
             except Exception as e:
                 print(f"Error fetching news for {keyword}: {e}")
         
-        # 日付順でソートし、上位10件を返す
+        # 日付順でソートし、上位10件を取得
         all_articles.sort(key=lambda x: x["published_at"], reverse=True)
-        return all_articles[:10]
+        selected_articles = all_articles[:10]
+        
+        # 日本語要約を追加
+        processed_articles = self.news_summarizer.process_news_articles(selected_articles)
+        
+        return processed_articles
     
     def format_schedule_data(self, outlook_events: List[Dict]) -> str:
         """

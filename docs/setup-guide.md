@@ -12,6 +12,19 @@
 1. [NewsAPI](https://newsapi.org/register) でAPIキーを取得
 2. 無料プランでは1日1000リクエストの制限
 
+#### AI要約機能用API（オプション）
+ニュース記事の日本語要約機能を有効にする場合：
+
+**Option A: OpenAI API（推奨）**
+1. [OpenAI Platform](https://platform.openai.com/) でAPIキーを取得
+2. 従量課金制：GPT-4o-mini利用時、入力$0.15/$1M文字、出力$0.60/$1M文字
+
+**Option B: Google Translate API**
+1. [Google Cloud Console](https://console.cloud.google.com/) でプロジェクト作成
+2. Cloud Translation API を有効化
+3. APIキーまたはサービスアカウントキーを作成
+4. 料金：$20/$1M文字
+
 #### Google API（Google Docs用）
 1. [Google Cloud Console](https://console.cloud.google.com/) でプロジェクト作成
 2. Google Drive API と Google Docs API を有効化

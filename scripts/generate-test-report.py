@@ -193,9 +193,14 @@ def generate_news_markdown(news_data):
             date_str = pub_date.strftime("%m/%d %H:%M")
             
             markdown += f"{i}. **[{article['title']}]({article['url']})**\n"
-            if article.get('description'):
+            
+            # 日本語要約を優先表示、なければ元の説明文
+            if article.get('summary_jp'):
+                markdown += f"   🇯🇵 **要約**: {article['summary_jp']}\n"
+            elif article.get('description'):
                 description = article['description'][:100] + "..." if len(article['description']) > 100 else article['description']
-                markdown += f"   {description}\n"
+                markdown += f"   📝 {description}\n"
+            
             markdown += f"   *{date_str}*\n\n"
     
     return markdown
