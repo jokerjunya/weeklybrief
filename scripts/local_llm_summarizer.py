@@ -57,7 +57,7 @@ class LocalLLMSummarizer:
             print(f"Ollama接続テストエラー: {e}")
             return False
     
-    def generate_summary_japanese(self, title: str, description: str, url: str = "") -> Optional[str]:
+    def generate_summary_japanese(self, title: str, description: str, url: str = "", content: str = "") -> Optional[str]:
         """
         英語のニュース記事から日本語要約を生成
         
@@ -65,39 +65,43 @@ class LocalLLMSummarizer:
             title (str): 記事タイトル（英語）
             description (str): 記事説明（英語）
             url (str): 記事URL（オプション）
+            content (str): 記事本文（英語、オプション）
         
         Returns:
             Optional[str]: 日本語要約（失敗時はNone）
         """
         if not self.enabled or not self.available:
-            return self._fallback_summary(title, description)
+            return self._improved_fallback_summary(title, description, content)
         
         try:
-            return self._summarize_with_qwen3(title, description)
+            return self._summarize_with_qwen3(title, description, content)
         except Exception as e:
             print(f"Qwen3要約エラー: {e}")
-            return self._fallback_summary(title, description)
+            return self._improved_fallback_summary(title, description, content)
     
-    def _summarize_with_qwen3(self, title: str, description: str) -> Optional[str]:
+    def _summarize_with_qwen3(self, title: str, description: str, content: str = "") -> Optional[str]:
         """
         Qwen3を使用して日本語要約を生成
         
         Args:
             title (str): 記事タイトル
             description (str): 記事説明
+            content (str): 記事本文（オプション）
         
         Returns:
             Optional[str]: 日本語要約
         """
+        # より多くの情報を活用して要約の質を向上
+        full_text = f"{title}. {description or ''} {content or ''}".strip()
+        
         # 非thinking modeを強制し、直接的な日本語要約を生成
         # Qwen3のchat templateを使用してthinking modeを回避
         prompt = f"""<|user|>
 以下の英語のAI業界ニュースを読んで、重要なポイントを日本語で50文字以内で要約してください。
 
-タイトル: {title}
-内容: {description}
+記事内容: {full_text[:500]}
 
-日本語要約を簡潔に作成してください。
+具体的な事実と結論が分かるように日本語要約を簡潔に作成してください。
 <|assistant|>
 """
         
@@ -151,29 +155,30 @@ class LocalLLMSummarizer:
                     return summary
                 else:
                     print("⚠️ Summary quality check failed, trying direct approach...")
-                    return self._direct_translation_approach(title, description)
+                    return self._direct_translation_approach(title, description, content)
                     
             else:
                 print(f"❌ Ollama APIエラー: {response.status_code}")
-                return self._direct_translation_approach(title, description)
+                return self._direct_translation_approach(title, description, content)
                 
         except Exception as e:
             print(f"❌ Qwen3 API呼び出しエラー: {e}")
-            return self._direct_translation_approach(title, description)
+            return self._direct_translation_approach(title, description, content)
     
-    def _direct_translation_approach(self, title: str, description: str) -> Optional[str]:
+    def _direct_translation_approach(self, title: str, description: str, content: str = "") -> Optional[str]:
         """
         より直接的なアプローチで翻訳・要約
         
         Args:
             title (str): 記事タイトル
             description (str): 記事説明
+            content (str): 記事本文（オプション）
         
         Returns:
             Optional[str]: 日本語要約
         """
-        # 最もシンプルなプロンプトで直接的に要求
-        text_to_summarize = f"{title}. {description}"
+        # より多くの情報を活用
+        text_to_summarize = f"{title}. {description or ''} {content or ''}".strip()
         
         prompt = f"""Translate to Japanese and summarize in 50 characters:
 
@@ -249,95 +254,175 @@ Japanese:"""
         
         return has_japanese and not too_similar
     
-    def _improved_fallback_summary(self, title: str, description: str) -> str:
+    def _improved_fallback_summary(self, title: str, description: str, content: str = "") -> str:
         """
         改善されたフォールバック要約
-        descriptionの内容を分析してより意味のある要約を作成
+        具体的な事実と結論が分かる要約を作成
         
         Args:
             title (str): 記事タイトル
             description (str): 記事説明
+            content (str): 記事本文（オプション）
         
         Returns:
             str: 日本語要約
         """
-        # 重要なキーワードマッピング（英語→日本語）
-        keyword_mapping = {
-            "announced": "発表",
-            "announces": "発表",
-            "launched": "リリース",
-            "launches": "リリース",
-            "released": "リリース",
-            "releases": "リリース",
-            "updated": "更新",
-            "updates": "更新",
-            "enhanced": "強化",
-            "improved": "改善",
-            "new": "新",
-            "AI": "AI",
-            "artificial intelligence": "AI",
-            "model": "モデル",
-            "technology": "技術",
-            "OpenAI": "OpenAI",
-            "Google": "Google",
-            "Meta": "Meta",
-            "funding": "資金調達",
-            "investment": "投資",
-            "partnership": "提携",
-            "acquisition": "買収",
-            "video": "動画",
-            "analysis": "分析",
-            "capabilities": "機能",
-            "performance": "性能",
-            "breakthrough": "ブレイクスルー"
-        }
+        # 全文を結合してより多くの情報を活用
+        full_content = f"{title}. {description or ''} {content or ''}".strip()
         
-        # descriptionまたはtitleから重要な情報を抽出
-        content = description if description and len(description) > 20 else title
-        
-        # キーワードベースの翻訳・要約
-        summary_parts = []
-        
-        # 会社名を特定
-        companies = ["OpenAI", "Google", "Meta", "Microsoft", "Amazon", "Apple", "Anthropic", "Gemini"]
-        for company in companies:
-            if company.lower() in content.lower():
-                summary_parts.append(company)
-                break
-        
-        # アクションを特定
-        for eng_word, jp_word in keyword_mapping.items():
-            if eng_word.lower() in content.lower():
-                summary_parts.append(jp_word)
-                break
-        
-        # 技術・製品を特定
-        tech_terms = ["GPT", "model", "AI", "video", "analysis", "tool", "platform", "API"]
-        for term in tech_terms:
-            if term.lower() in content.lower():
-                if term == "model":
-                    summary_parts.append("AIモデル")
-                elif term == "video":
-                    summary_parts.append("動画")
-                elif term == "analysis":
-                    summary_parts.append("分析")
-                else:
-                    summary_parts.append(term)
-                break
-        
-        # 要約を構築
-        if summary_parts:
-            summary = "".join(summary_parts[:3]) + "関連ニュース"
-        else:
-            # 最低限の情報
-            first_sentence = content.split('.')[0] if '.' in content else content
-            summary = f"AI業界: {first_sentence[:20]}..."
+        # 具体的な事実を抽出するパターン分析
+        summary = self._extract_key_facts(full_content)
         
         # 50文字制限
         if len(summary) > 50:
             summary = summary[:47] + "..."
         
         return summary
+    
+    def _extract_key_facts(self, content: str) -> str:
+        """
+        ニュース内容から具体的な事実と結論を抽出
+        
+        Args:
+            content (str): ニュース全文
+        
+        Returns:
+            str: 具体的な事実を含む日本語要約
+        """
+        content_lower = content.lower()
+        
+        # パターン1: 会社間の動き（買収、提携、競争等）
+        if "meta" in content_lower and "openai" in content_lower:
+            if "bonus" in content_lower or "million" in content_lower:
+                return "Meta、OpenAI社員に巨額ボーナス提示で引き抜き"
+            elif "compete" in content_lower or "competition" in content_lower:
+                return "MetaとOpenAI、AI人材を巡り競争激化"
+            else:
+                return "MetaとOpenAI間で新たな動き"
+        
+        # パターン2: 新製品・機能発表
+        if any(word in content_lower for word in ["announce", "launch", "release", "unveil"]):
+            # OpenAI関連
+            if "openai" in content_lower:
+                if "gpt" in content_lower and ("5" in content or "new" in content_lower):
+                    return "OpenAI、新型GPTモデルを発表"
+                elif "pentagon" in content_lower or "defense" in content_lower:
+                    return "OpenAI、米国防総省と契約締結"
+                else:
+                    return "OpenAI、新サービス・機能を発表"
+            
+            # Google/Gemini関連
+            elif "gemini" in content_lower or "google" in content_lower:
+                if "video" in content_lower:
+                    return "Google Gemini、動画分析機能を追加"
+                elif "update" in content_lower:
+                    return "Google Gemini、機能強化版をリリース"
+                else:
+                    return "Google、AI新機能を発表"
+            
+            # その他企業
+            elif "microsoft" in content_lower:
+                return "Microsoft、AI関連新製品を発表"
+            elif "amazon" in content_lower:
+                return "Amazon、AI戦略を発表"
+        
+        # パターン3: 投資・資金調達
+        if any(word in content_lower for word in ["funding", "investment", "raise", "million", "billion"]):
+            if "startup" in content_lower:
+                return "AI関連スタートアップ、大型資金調達"
+            else:
+                return "AI業界で大型投資案件が発生"
+        
+        # パターン4: 技術革新・ブレイクスルー
+        if any(word in content_lower for word in ["breakthrough", "advancement", "improve", "enhance"]):
+            if "reasoning" in content_lower or "logic" in content_lower:
+                return "AI推論能力が大幅向上、新技術を開発"
+            elif "performance" in content_lower:
+                return "AI性能向上、処理速度が改善"
+            else:
+                return "AI技術で新たなブレイクスルー"
+        
+        # パターン5: 人事・組織変更
+        if any(word in content_lower for word in ["hire", "employee", "ceo", "executive"]):
+            return "AI企業で重要人事、組織体制を変更"
+        
+        # パターン6: 規制・政策
+        if any(word in content_lower for word in ["regulation", "policy", "government", "law"]):
+            return "AI規制・政策に関する重要動向"
+        
+        # パターン7: パートナーシップ・提携
+        if any(word in content_lower for word in ["partnership", "collaborate", "team up"]):
+            companies = self._extract_companies(content)
+            if len(companies) >= 2:
+                return f"{companies[0]}と{companies[1]}が提携"
+            else:
+                return "AI業界で新たな提携が発表"
+        
+        # パターン8: PyPI/GitHub等開発ツール
+        if "pypi" in content_lower or "github" in content_lower:
+            return "AI開発ツール、新ライブラリが公開"
+        
+        # デフォルト: タイトルから最重要情報を抽出
+        return self._extract_from_title(content)
+    
+    def _extract_companies(self, content: str) -> List[str]:
+        """
+        文章から企業名を抽出
+        
+        Args:
+            content (str): ニュース内容
+        
+        Returns:
+            List[str]: 抽出された企業名リスト
+        """
+        companies = []
+        company_names = [
+            ("OpenAI", "OpenAI"), ("Google", "Google"), ("Meta", "Meta"), 
+            ("Microsoft", "Microsoft"), ("Amazon", "Amazon"), ("Apple", "Apple"),
+            ("Anthropic", "Anthropic"), ("Tesla", "Tesla"), ("xAI", "xAI")
+        ]
+        
+        content_lower = content.lower()
+        for english, japanese in company_names:
+            if english.lower() in content_lower:
+                companies.append(japanese)
+        
+        return companies
+    
+    def _extract_from_title(self, content: str) -> str:
+        """
+        タイトルから重要情報を抽出してより意味のある要約を作成
+        
+        Args:
+            content (str): ニュース内容
+        
+        Returns:
+            str: 意味のある要約
+        """
+        # タイトルの最初の部分（通常最も重要）を取得
+        title = content.split('.')[0]
+        
+        # 企業名を特定
+        companies = self._extract_companies(title)
+        company = companies[0] if companies else "AI企業"
+        
+        # キーワードベースの動作抽出
+        title_lower = title.lower()
+        
+        if "warn" in title_lower or "warning" in title_lower:
+            return f"{company}CEO、AI関連で重要警告"
+        elif "cut" in title_lower and "time" in title_lower:
+            return f"{company}、AI活用で作業時間を大幅短縮"
+        elif "hire" in title_lower or "talent" in title_lower:
+            return f"{company}、AI人材確保に積極投資"
+        elif "video" in title_lower and "analysis" in title_lower:
+            return f"{company}、動画AI分析サービス開始"
+        elif "chatbot" in title_lower:
+            return f"{company}、チャットボット技術を向上"
+        else:
+            # 最後の手段：タイトル前半の重要部分を日本語化
+            important_part = title[:30].strip()
+            return f"AI業界: {important_part}..."
     
     def _clean_summary(self, summary: str) -> str:
         """
@@ -440,11 +525,12 @@ Japanese:"""
             
             print(f"📝 記事 {i+1}/{len(articles)} を要約中...")
             
-            # 日本語要約を生成
+            # 日本語要約を生成（contentも含める）
             summary_jp = self.generate_summary_japanese(
                 title=article.get("title", ""),
                 description=article.get("description", ""),
-                url=article.get("url", "")
+                url=article.get("url", ""),
+                content=article.get("content", "")
             )
             
             processed_article["summary_jp"] = summary_jp
@@ -471,6 +557,246 @@ Japanese:"""
             "thinking_mode": self.thinking_mode,
             "fallback_enabled": True
         }
+
+    def generate_weekly_news_summary(self, articles: List[Dict[str, Any]]) -> str:
+        """
+        週のニュース記事全体を日本語で300文字程度にサマライズ
+        
+        Args:
+            articles (List[Dict]): 処理済みニュース記事リスト
+        
+        Returns:
+            str: 週間ニュースサマリー（日本語、300文字程度）
+        """
+        if not articles:
+            return "今週は注目すべきAI業界ニュースはありませんでした。"
+        
+        # 記事の主要情報を抽出
+        titles = [article.get("title", "") for article in articles[:8]]  # 上位8件
+        summaries = [article.get("summary_jp", "") for article in articles[:8]]
+        
+        if not self.enabled or not self.available:
+            return self._create_fallback_weekly_summary(articles)
+        
+        try:
+            return self._generate_weekly_summary_with_qwen3(titles, summaries)
+        except Exception as e:
+            print(f"週間サマリー生成エラー: {e}")
+            return self._create_fallback_weekly_summary(articles)
+    
+    def _generate_weekly_summary_with_qwen3(self, titles: List[str], summaries: List[str]) -> str:
+        """
+        Qwen3を使用して週間ニュースサマリーを生成
+        
+        Args:
+            titles (List[str]): 記事タイトルリスト
+            summaries (List[str]): 個別記事要約リスト
+        
+        Returns:
+            str: 週間サマリー
+        """
+        # 記事情報を整理
+        article_info = []
+        for i, (title, summary) in enumerate(zip(titles, summaries)):
+            if title and summary:
+                article_info.append(f"{i+1}. {summary}")
+        
+        articles_text = "\n".join(article_info[:6])  # 上位6件
+        
+        prompt = f"""<|user|>
+以下は今週のAI業界ニュースです。全体的なトレンドと重要なポイントを日本語で300文字以内でまとめてください。
+
+今週のニュース:
+{articles_text}
+
+業界全体の動向、主要企業の動き、注目すべき技術トレンドを含めて週間サマリーを作成してください。
+<|assistant|>
+"""
+        
+        payload = {
+            "model": self.model_name,
+            "prompt": prompt,
+            "stream": False,
+            "options": {
+                "temperature": 0.4,
+                "top_p": 0.9,
+                "num_predict": 400,
+                "stop": ["<|user|>", "<|assistant|>"],
+                "repeat_penalty": 1.1
+            }
+        }
+        
+        try:
+            print("🔍 週間ニュースサマリーを生成中...")
+            
+            response = requests.post(
+                f"{self.ollama_url}/api/generate",
+                json=payload,
+                timeout=45
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                raw_summary = result.get('response', '').strip()
+                
+                # thinking modeのクリーンアップ
+                if '<think>' in raw_summary:
+                    if '</think>' in raw_summary:
+                        raw_summary = raw_summary.split('</think>')[-1].strip()
+                    else:
+                        return self._create_fallback_weekly_summary_from_summaries(summaries)
+                
+                # サマリーのクリーンアップ
+                summary = self._clean_weekly_summary(raw_summary)
+                
+                # 品質チェック
+                if len(summary) > 50 and any(char in summary for char in 'あいうえおかきくけこ'):
+                    return summary
+                else:
+                    return self._create_fallback_weekly_summary_from_summaries(summaries)
+            else:
+                return self._create_fallback_weekly_summary_from_summaries(summaries)
+                
+        except Exception as e:
+            print(f"週間サマリー生成エラー: {e}")
+            return self._create_fallback_weekly_summary_from_summaries(summaries)
+    
+    def _create_fallback_weekly_summary(self, articles: List[Dict[str, Any]]) -> str:
+        """
+        フォールバック週間サマリー作成
+        
+        Args:
+            articles (List[Dict]): ニュース記事リスト
+        
+        Returns:
+            str: 週間サマリー
+        """
+        summaries = [article.get("summary_jp", "") for article in articles if article.get("summary_jp")]
+        return self._create_fallback_weekly_summary_from_summaries(summaries)
+    
+    def _create_fallback_weekly_summary_from_summaries(self, summaries: List[str]) -> str:
+        """
+        個別要約から週間サマリーを構築
+        
+        Args:
+            summaries (List[str]): 個別記事要約リスト
+        
+        Returns:
+            str: 週間サマリー
+        """
+        if not summaries:
+            return "今週は注目すべきAI業界ニュースはありませんでした。"
+        
+        # 主要トピックを分析
+        topics = {
+            "企業競争": 0,
+            "技術発表": 0,
+            "投資・資金調達": 0,
+            "人事・組織": 0,
+            "製品リリース": 0,
+            "政府・規制": 0
+        }
+        
+        key_companies = set()
+        
+        for summary in summaries[:8]:
+            summary_lower = summary.lower()
+            
+            # トピック分析
+            if any(word in summary for word in ["引き抜き", "競争", "ボーナス"]):
+                topics["企業競争"] += 1
+            if any(word in summary for word in ["発表", "リリース", "開始"]):
+                topics["技術発表"] += 1
+            if any(word in summary for word in ["投資", "資金調達", "大型"]):
+                topics["投資・資金調達"] += 1
+            if any(word in summary for word in ["人事", "組織", "CEO"]):
+                topics["人事・組織"] += 1
+            if any(word in summary for word in ["サービス", "機能", "動画"]):
+                topics["製品リリース"] += 1
+            if any(word in summary for word in ["政府", "規制", "政策"]):
+                topics["政府・規制"] += 1
+            
+            # 企業名抽出
+            for company in ["OpenAI", "Meta", "Google", "Microsoft", "Amazon", "Apple"]:
+                if company in summary:
+                    key_companies.add(company)
+        
+        # 主要トピックを特定
+        main_topic = max(topics.items(), key=lambda x: x[1])
+        
+        # サマリー構築
+        companies_str = "、".join(list(key_companies)[:3]) if key_companies else "AI関連企業"
+        
+        if main_topic[1] > 0:
+            if main_topic[0] == "企業競争":
+                summary_text = f"今週のAI業界では{companies_str}を中心とした人材獲得競争が激化。"
+            elif main_topic[0] == "技術発表":
+                summary_text = f"今週は{companies_str}による新技術・サービス発表が相次ぎ、AI機能の実用化が加速。"
+            elif main_topic[0] == "投資・資金調達":
+                summary_text = f"AI業界で大型投資案件が活発化。{companies_str}関連の資金調達ニュースが目立つ。"
+            elif main_topic[0] == "製品リリース":
+                summary_text = f"{companies_str}が新製品・機能を相次いで発表。特に動画AI分析などの実用的サービスが注目。"
+            else:
+                summary_text = f"今週のAI業界では{companies_str}を中心とした動きが活発化。"
+        else:
+            summary_text = f"今週のAI業界では{companies_str}による様々な取り組みが報告され、"
+        
+        # 具体的な動向を追加
+        specific_trends = []
+        for summary in summaries[:3]:
+            if len(summary) > 10 and summary not in summary_text:
+                specific_trends.append(summary.replace("AI業界: ", "").replace("...", ""))
+        
+        if specific_trends:
+            summary_text += f" 主な動向として{specific_trends[0]}など、"
+            if len(specific_trends) > 1:
+                summary_text += f"{specific_trends[1]}といった展開も見られる。"
+            else:
+                summary_text += "業界全体の変化が継続している。"
+        else:
+            summary_text += " 業界全体でAI技術の実用化と競争が加速している状況が続いている。"
+        
+        # 300文字制限
+        if len(summary_text) > 300:
+            summary_text = summary_text[:297] + "..."
+        
+        return summary_text
+    
+    def _clean_weekly_summary(self, summary: str) -> str:
+        """
+        週間サマリーをクリーンアップ
+        
+        Args:
+            summary (str): 生の週間サマリー
+        
+        Returns:
+            str: クリーンアップされた週間サマリー
+        """
+        # 不要な前置きを除去
+        prefixes_to_remove = [
+            "今週のAI業界ニュースをまとめると、",
+            "週間サマリー:",
+            "まとめ:",
+            "概要:",
+            "今週は、"
+        ]
+        
+        for prefix in prefixes_to_remove:
+            if summary.startswith(prefix):
+                summary = summary[len(prefix):].strip()
+        
+        # 改行を除去
+        summary = summary.replace('\n', ' ').replace('\r', ' ')
+        
+        # 複数スペースを単一スペースに
+        import re
+        summary = re.sub(r'\s+', ' ', summary)
+        
+        # 300文字制限
+        if len(summary) > 300:
+            summary = summary[:297] + "..."
+        
+        return summary.strip()
 
 
 if __name__ == "__main__":

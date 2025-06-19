@@ -21,9 +21,10 @@ def generate_test_report():
     # データ処理インスタンス作成
     processor = WeeklyReportProcessor()
     
-    # 1. 売上データ処理
+    # 1. 売上データ処理（ハイブリッド方式）
     print("📊 売上データ処理中...")
-    sales_data = processor.process_sales_data("/Users/01062544/Downloads/weekly_sales_report.csv")
+    print("   📋 Placement（ダミーデータ）+ Online Platform（実データ）を統合")
+    sales_data = processor.process_sales_data()
     print(f"   ✅ 総売上: ¥{sales_data['total_current_sales']:,}")
     
     # 2. 株価データ取得
@@ -40,6 +41,11 @@ def generate_test_report():
     keywords = processor.config["data_sources"]["news_data"]["keywords"]
     news_data = processor.fetch_news_data(keywords)
     print(f"   ✅ 記事取得: {len(news_data)}件")
+    
+    # 3.5. 週間ニュースサマリー生成
+    print("📋 週間ニュースサマリー生成中...")
+    weekly_summary = processor.get_weekly_news_summary(news_data)
+    print(f"   ✅ サマリー生成完了: {len(weekly_summary)}文字")
     
     # 4. HTMLテーブル生成
     print("🔧 HTMLテーブル生成中...")
@@ -119,15 +125,23 @@ def generate_test_report():
 
 ---
 
-## 📰 業界ニュース
-
-{news_markdown}
-
----
-
 ## 📅 今週のスケジュール
 
 {schedule_markdown}
+
+---
+
+## 📰 業界ニュース
+
+### 📋 今週のサマリー
+
+{weekly_summary}
+
+---
+
+### 📄 詳細記事
+
+{news_markdown}
 
 ---
 

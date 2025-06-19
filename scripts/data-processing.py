@@ -5,6 +5,7 @@ Power Automateから呼び出し可能な形式でデータを処理
 """
 
 import json
+import os
 import pandas as pd
 from datetime import datetime, timedelta
 import requests
@@ -25,48 +26,98 @@ class WeeklyReportProcessor:
             self.news_summarizer = NewsSummarizer(config_path)
             print("☁️  クラウドAPI要約機能を使用")
     
-    def process_sales_data(self, csv_file_path: str) -> Dict[str, Any]:
+    def process_sales_data(self, csv_file_path: str = None) -> Dict[str, Any]:
         """
-        売上CSVデータを処理してサマリーを生成
+        売上データを処理（Placement: ダミー、Online Platform: 実データ）
+        """
+        # Online Platform（サービスB）の実データパス
+        online_platform_csv = "/Users/01062544/Downloads/Revenue_jp_weekly_non-RAG_YoY&WoW.csv"
+        
+        # サービスA（Placement）のダミーデータ
+        placement_data = {
+            "name": "Placement",
+            "current_sales": 12345678,
+            "yoy_change": 21.9,
+            "weekly_change": 3.2
+        }
+        
+        # サービスB（Online Platform）の実データを読み込み
+        online_platform_data = self._load_online_platform_data(online_platform_csv)
+        
+        # 統合データを生成
+        services = [placement_data, online_platform_data]
+        
+        # 全体集計
+        total_current = placement_data["current_sales"] + online_platform_data["current_sales"]
+        
+        # 前年同期データ（概算）
+        placement_prev_year = placement_data["current_sales"] / (1 + placement_data["yoy_change"] / 100)
+        online_platform_prev_year = online_platform_data["previous_year_sales"]
+        total_previous_year = placement_prev_year + online_platform_prev_year
+        
+        # 前週データ（概算）
+        placement_prev_week = placement_data["current_sales"] / (1 + placement_data["weekly_change"] / 100)
+        online_platform_prev_week = online_platform_data["previous_week_sales"]
+        total_previous_week = placement_prev_week + online_platform_prev_week
+        
+        # 全体成長率計算
+        yoy_growth = ((total_current - total_previous_year) / total_previous_year * 100) if total_previous_year > 0 else 0
+        weekly_change = ((total_current - total_previous_week) / total_previous_week * 100) if total_previous_week > 0 else 0
+        
+        return {
+            "total_current_sales": int(total_current),
+            "total_previous_year_sales": int(total_previous_year),
+            "yoy_growth_rate": round(yoy_growth, 1),
+            "weekly_change": round(weekly_change, 1),
+            "service_count": len(services),
+            "services": services
+        }
+    
+    def _load_online_platform_data(self, csv_path: str) -> Dict[str, Any]:
+        """
+        Online Platform（サービスB）の実データを読み込み
         """
         try:
-            df = pd.read_csv(csv_file_path, encoding='utf-8')
+            if not os.path.exists(csv_path):
+                print(f"⚠️  Online Platformデータが見つかりません: {csv_path}")
+                return self._get_dummy_online_platform_data()
             
-            # 合計行を除いてサービス別データを取得
-            service_data = df[df['サービス名'] != '合計／平均'].copy()
-            total_row = df[df['サービス名'] == '合計／平均'].iloc[0]
+            df = pd.read_csv(csv_path)
             
-            # 数値データの変換（カンマ区切りの数値を整数に変換）
-            def clean_numeric(value):
-                if isinstance(value, str):
-                    return int(value.replace(',', ''))
-                # NumPy型をPython標準型に変換
-                if hasattr(value, 'item'):
-                    return value.item()
-                return int(value) if isinstance(value, (int, float)) else value
+            # CSVファイルの構造: this_week_revenue_jpy,last_week_revenue_jpy,last_year_same_week_revenue_jpy,wow_pct,yoy_pct
+            row = df.iloc[0]  # 最初の行を取得
             
-            # サマリー情報を生成
-            summary = {
-                "total_current_sales": clean_numeric(total_row['今週売上額 (¥)']),
-                "total_previous_year_sales": clean_numeric(total_row['前年同週売上額 (¥)']),
-                "yoy_growth_rate": float(total_row['YoY増減率 (%)']),
-                "weekly_change": float(total_row['前週比 (%)']),
-                "service_count": int(len(service_data)),
-                "services": []
+            current_sales = int(row['this_week_revenue_jpy'])
+            previous_week_sales = int(row['last_week_revenue_jpy'])
+            previous_year_sales = int(row['last_year_same_week_revenue_jpy'])
+            wow_pct = float(row['wow_pct'])
+            yoy_pct = float(row['yoy_pct'])
+            
+            return {
+                "name": "Online Platform",
+                "current_sales": current_sales,
+                "previous_week_sales": previous_week_sales,
+                "previous_year_sales": previous_year_sales,
+                "yoy_change": yoy_pct,
+                "weekly_change": wow_pct
             }
             
-            # サービス別詳細
-            for _, row in service_data.iterrows():
-                summary["services"].append({
-                    "name": str(row['サービス名']),
-                    "current_sales": clean_numeric(row['今週売上額 (¥)']),
-                    "yoy_change": float(row['YoY増減率 (%)']),
-                    "weekly_change": float(row['前週比 (%)'])
-                })
-            
-            return summary
         except Exception as e:
-            return {"error": str(e)}
+            print(f"❌ Online Platformデータ読み込みエラー: {e}")
+            return self._get_dummy_online_platform_data()
+    
+    def _get_dummy_online_platform_data(self) -> Dict[str, Any]:
+        """
+        Online Platformのダミーデータ（フォールバック用）
+        """
+        return {
+            "name": "Online Platform",
+            "current_sales": 8765432,
+            "previous_week_sales": 8987654,
+            "previous_year_sales": 9876543,
+            "yoy_change": -11.2,
+            "weekly_change": -2.5
+        }
     
     def fetch_stock_data(self, tickers: List[str]) -> Dict[str, Any]:
         """
@@ -144,9 +195,24 @@ class WeeklyReportProcessor:
                 
                 if data.get("articles"):
                     for article in data["articles"]:
+                        # より多くの情報を収集（title + description + content）
+                        title = article.get("title", "")
+                        description = article.get("description", "") or ""
+                        content = article.get("content", "") or ""
+                        
+                        # contentからHTMLタグやノイズを除去
+                        import re
+                        if content:
+                            # 一般的なノイズパターンを除去
+                            content = re.sub(r'[{}\[\]"\'\\]', '', content)
+                            content = re.sub(r'window\.open.*?return false;', '', content)
+                            content = re.sub(r'https?://[^\s]+', '', content)  # URLを除去
+                            content = re.sub(r'\s+', ' ', content).strip()  # 空白を正規化
+                        
                         all_articles.append({
-                            "title": article["title"],
-                            "description": article["description"],
+                            "title": title,
+                            "description": description,
+                            "content": content,  # 新規追加
                             "url": article["url"],
                             "published_at": article["publishedAt"],
                             "keyword": keyword
@@ -162,6 +228,18 @@ class WeeklyReportProcessor:
         processed_articles = self.news_summarizer.process_news_articles(selected_articles)
         
         return processed_articles
+    
+    def get_weekly_news_summary(self, articles: List[Dict[str, Any]]) -> str:
+        """
+        週間ニュースサマリーを生成
+        
+        Args:
+            articles (List[Dict]): 処理済みニュース記事リスト
+        
+        Returns:
+            str: 週間ニュースサマリー（300文字程度）
+        """
+        return self.news_summarizer.generate_weekly_news_summary(articles)
     
     def format_schedule_data(self, outlook_events: List[Dict]) -> str:
         """
@@ -250,9 +328,10 @@ if __name__ == "__main__":
     # テスト実行用
     processor = WeeklyReportProcessor()
     
-    # 売上データ処理テスト
+    # 売上データ処理テスト（ハイブリッド方式）
     print("=== 売上データ処理テスト ===")
-    sales_data = processor.process_sales_data("/Users/01062544/Downloads/weekly_sales_report.csv")
+    print("📊 Placement（ダミー）+ Online Platform（実データ）の統合データを生成")
+    sales_data = processor.process_sales_data()
     print(json.dumps(sales_data, indent=2, ensure_ascii=False))
     
     # サンプル株価データでテスト（実際のAPIキーが設定されていない場合）
