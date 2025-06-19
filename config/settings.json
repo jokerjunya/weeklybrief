@@ -22,11 +22,11 @@
     "stock_data": {
       "api_key": "L5VIGOU04YJW64BT",
       "url": "https://www.alphavantage.co/query",
-      "tickers": ["AAPL", "GOOGL", "MSFT"],
+      "tickers": ["EWJ", "SPY", "RCRUY"],
       "ticker_names": {
-        "AAPL": "Apple Inc.",
-        "GOOGL": "Alphabet Inc.",
-        "MSFT": "Microsoft Corp."
+        "EWJ": "日本株ETF (iShares MSCI Japan)",
+        "SPY": "S&P 500 ETF",
+        "RCRUY": "リクルートホールディングス (ADR)"
       }
     },
     "news_data": {
