@@ -21,11 +21,18 @@ def generate_test_report():
     # データ処理インスタンス作成
     processor = WeeklyReportProcessor()
     
-    # 1. 売上データ処理（ハイブリッド方式）
-    print("📊 売上データ処理中...")
-    print("   📋 Placement（ダミーデータ）+ Online Platform（実データ）を統合")
+    # 1. ビジネスデータ処理（事業別メトリクス）
+    print("📊 ビジネスデータ処理中...")
+    print("   📋 Placement（内定数）+ Online Platform（売上）を統合")
     sales_data = processor.process_sales_data()
-    print(f"   ✅ 総売上: ¥{sales_data['total_current_sales']:,}")
+    
+    online_platform = next((s for s in sales_data['services'] if s['name'] == 'Online Platform'), None)
+    placement = next((s for s in sales_data['services'] if s['name'] == 'Placement'), None)
+    
+    if online_platform:
+        print(f"   ✅ Online Platform売上: ¥{online_platform['current_value']:,}")
+    if placement:
+        print(f"   ✅ Placement内定数: {placement['current_value']:,}件")
     
     # 2. 株価データ取得
     print("📈 株価データ取得中...")
@@ -51,11 +58,11 @@ def generate_test_report():
     print("🔧 HTMLテーブル生成中...")
     tables = processor.generate_html_tables(sales_data, valid_stocks)
     
-    # 5. スケジュールデータ（サンプル）
+    # 5. スケジュールデータ（6月実スケジュール）
     sample_schedule = [
-        {"subject": "月曜定例会議", "start": "2024-01-15T09:00:00Z"},
-        {"subject": "プロジェクトレビュー", "start": "2024-01-17T14:00:00Z"},
-        {"subject": "週次売上レポート確認", "start": "2024-01-19T10:00:00Z"}
+        {"subject": "JP HR Steering Committee", "start": "2025-06-24T09:00:00Z"},
+        {"subject": "株主総会オンサイト", "start": "2025-06-25T10:00:00Z"},
+        {"subject": "Bi-weekly SLT Meeting", "start": "2025-06-27T14:00:00Z"}
     ]
     
     # 6. レポート生成
@@ -68,40 +75,41 @@ def generate_test_report():
     # スケジュールをMarkdown形式に変換
     schedule_markdown = generate_schedule_markdown(sample_schedule)
     
+    # ハイライト計算（Online Platformのみ）
+    online_platform = next((s for s in sales_data['services'] if s['name'] == 'Online Platform'), None)
+    placement = next((s for s in sales_data['services'] if s['name'] == 'Placement'), None)
+    
     # レポート内容生成
     report_content = f"""# 週次レポート - {report_date}
 
 ## 📊 今週のハイライト
 
-- **総売上**: ¥{sales_data['total_current_sales']:,}
-- **前年同期比**: {sales_data['yoy_growth_rate']:+.1f}%
-- **前週比**: {sales_data['weekly_change']:+.1f}%
+- **Online Platform売上**: ¥{online_platform['current_value']:,}
+- **Online Platform前年同期比**: {online_platform['yoy_change']:+.1f}%
+- **Placement内定数**: {placement['current_value']:,}件
 - **監視銘柄**: {len(valid_stocks)}銘柄
 - **業界ニュース**: {len(news_data)}件
 
 ---
 
-## 💰 売上サマリー
+## 💼 ビジネス実績
 
-### 全体実績
-| 項目 | 値 |
-|------|------|
-| 今週総売上 | ¥{sales_data['total_current_sales']:,} |
-| 前年同週売上 | ¥{sales_data['total_previous_year_sales']:,} |
-| 前年同期比 | {sales_data['yoy_growth_rate']:+.1f}% |
-| 前週比 | {sales_data['weekly_change']:+.1f}% |
-
-### サービス別実績
-| サービス名 | 今週売上 | 前年同期比 | 前週比 |
-|------------|----------|------------|--------|"""
+| サービス名 | 指標 | 今週実績 | 前年同期比 | 前週比 |
+|------------|------|----------|------------|--------|"""
 
     # サービス別データを追加
     for service in sales_data['services']:
         yoy_icon = "📈" if service['yoy_change'] > 0 else "📉"
         weekly_icon = "⬆️" if service['weekly_change'] > 0 else "⬇️"
         
+        # メトリックタイプに応じて値をフォーマット
+        if service.get('metric_type') == '内定数':
+            current_display = f"{service['current_value']:,}件"
+        else:  # 売上
+            current_display = f"¥{service['current_value']:,}"
+        
         report_content += f"""
-| {service['name']} | ¥{service['current_sales']:,} | {yoy_icon} {service['yoy_change']:+.1f}% | {weekly_icon} {service['weekly_change']:+.1f}% |"""
+| {service['name']} | {service['metric_type']} | {current_display} | {yoy_icon} {service['yoy_change']:+.1f}% | {weekly_icon} {service['weekly_change']:+.1f}% |"""
 
     report_content += f"""
 

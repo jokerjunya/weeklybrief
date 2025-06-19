@@ -28,47 +28,40 @@ class WeeklyReportProcessor:
     
     def process_sales_data(self, csv_file_path: str = None) -> Dict[str, Any]:
         """
-        売上データを処理（Placement: ダミー、Online Platform: 実データ）
+        ビジネスデータを処理（Placement: 内定数、Online Platform: 売上）
         """
         # Online Platform（サービスB）の実データパス
         online_platform_csv = "/Users/01062544/Downloads/Revenue_jp_weekly_non-RAG_YoY&WoW.csv"
         
-        # サービスA（Placement）のダミーデータ
+        # Placement（サービスA）の内定数ダミーデータ
         placement_data = {
             "name": "Placement",
-            "current_sales": 12345678,
-            "yoy_change": 21.9,
-            "weekly_change": 3.2
+            "metric_type": "内定数",
+            "current_value": 234,  # 今週の内定数
+            "previous_year_value": 189,  # 前年同期の内定数
+            "previous_week_value": 221,  # 前週の内定数
+            "yoy_change": 23.8,  # 前年同期比
+            "weekly_change": 5.9  # 前週比
         }
         
-        # サービスB（Online Platform）の実データを読み込み
+        # Online Platform（サービスB）の売上実データを読み込み
         online_platform_data = self._load_online_platform_data(online_platform_csv)
         
-        # 統合データを生成
-        services = [placement_data, online_platform_data]
-        
-        # 全体集計
-        total_current = placement_data["current_sales"] + online_platform_data["current_sales"]
-        
-        # 前年同期データ（概算）
-        placement_prev_year = placement_data["current_sales"] / (1 + placement_data["yoy_change"] / 100)
-        online_platform_prev_year = online_platform_data["previous_year_sales"]
-        total_previous_year = placement_prev_year + online_platform_prev_year
-        
-        # 前週データ（概算）
-        placement_prev_week = placement_data["current_sales"] / (1 + placement_data["weekly_change"] / 100)
-        online_platform_prev_week = online_platform_data["previous_week_sales"]
-        total_previous_week = placement_prev_week + online_platform_prev_week
-        
-        # 全体成長率計算
-        yoy_growth = ((total_current - total_previous_year) / total_previous_year * 100) if total_previous_year > 0 else 0
-        weekly_change = ((total_current - total_previous_week) / total_previous_week * 100) if total_previous_week > 0 else 0
+        # サービス別データリスト
+        services = [
+            placement_data,
+            {
+                "name": "Online Platform",
+                "metric_type": "売上",
+                "current_value": online_platform_data["current_sales"],
+                "previous_week_value": online_platform_data.get("previous_week_sales"),
+                "previous_year_value": online_platform_data["previous_year_sales"],
+                "yoy_change": online_platform_data["yoy_change"],
+                "weekly_change": online_platform_data["weekly_change"]
+            }
+        ]
         
         return {
-            "total_current_sales": int(total_current),
-            "total_previous_year_sales": int(total_previous_year),
-            "yoy_growth_rate": round(yoy_growth, 1),
-            "weekly_change": round(weekly_change, 1),
             "service_count": len(services),
             "services": services
         }
@@ -259,41 +252,37 @@ class WeeklyReportProcessor:
         """
         HTMLテーブルを生成
         """
-        # 売上サマリーテーブル
-        sales_summary_html = f"""
-        <table border="1" style="border-collapse: collapse; width: 100%;">
-            <tr style="background-color: #f2f2f2;"><th>項目</th><th>値</th></tr>
-            <tr><td>今週総売上</td><td>¥{sales_data.get('total_current_sales', 0):,}</td></tr>
-            <tr><td>前年同週売上</td><td>¥{sales_data.get('total_previous_year_sales', 0):,}</td></tr>
-            <tr><td>前年同期比</td><td>{sales_data.get('yoy_growth_rate', 0)}%</td></tr>
-            <tr><td>前週比</td><td>{sales_data.get('weekly_change', 0)}%</td></tr>
-        </table>
-        """
-        
-        # サービス別売上テーブル
+        # サービス別ビジネスメトリクステーブル
         if sales_data.get("services"):
             service_rows = []
             for service in sales_data["services"]:
                 yoy_color = "green" if service.get('yoy_change', 0) > 0 else "red"
                 weekly_color = "green" if service.get('weekly_change', 0) > 0 else "red"
+                
+                # メトリックタイプに応じて値をフォーマット
+                if service.get('metric_type') == '内定数':
+                    current_display = f"{service['current_value']:,}件"
+                else:  # 売上
+                    current_display = f"¥{service['current_value']:,}"
+                
                 service_rows.append(f"""
                     <tr>
                         <td>{service['name']}</td>
-                        <td>¥{service['current_sales']:,}</td>
+                        <td>{service.get('metric_type', 'N/A')}</td>
+                        <td>{current_display}</td>
                         <td style="color: {yoy_color};">{service['yoy_change']}%</td>
                         <td style="color: {weekly_color};">{service['weekly_change']}%</td>
                     </tr>
                 """)
             
-            services_html = f"""
+            sales_table_html = f"""
             <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 10px;">
-                <tr style="background-color: #f2f2f2;"><th>サービス名</th><th>今週売上</th><th>前年同期比</th><th>前週比</th></tr>
+                <tr style="background-color: #f2f2f2;"><th>サービス名</th><th>指標</th><th>今週実績</th><th>前年同期比</th><th>前週比</th></tr>
                 {''.join(service_rows)}
             </table>
             """
-            sales_table_html = sales_summary_html + services_html
         else:
-            sales_table_html = sales_summary_html
+            sales_table_html = "<p>ビジネスデータがありません。</p>"
         
         # 株価テーブル
         stock_rows = []
@@ -328,9 +317,9 @@ if __name__ == "__main__":
     # テスト実行用
     processor = WeeklyReportProcessor()
     
-    # 売上データ処理テスト（ハイブリッド方式）
-    print("=== 売上データ処理テスト ===")
-    print("📊 Placement（ダミー）+ Online Platform（実データ）の統合データを生成")
+    # ビジネスデータ処理テスト（事業別メトリクス）
+    print("=== ビジネスデータ処理テスト ===")
+    print("📊 Placement（内定数）+ Online Platform（売上）の事業別データを生成")
     sales_data = processor.process_sales_data()
     print(json.dumps(sales_data, indent=2, ensure_ascii=False))
     
