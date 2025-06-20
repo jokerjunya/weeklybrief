@@ -1,309 +1,316 @@
-// Theme Management
-class ThemeManager {
+// Weekly Report Interactive Features
+class WeeklyReportApp {
     constructor() {
-        this.theme = localStorage.getItem('theme') || 'light';
-        this.init();
+        this.currentTheme = 'light';
+        this.currentFilter = 'all';
+        this.initializeApp();
     }
 
-    init() {
-        this.setTheme(this.theme);
-        this.bindEvents();
+    initializeApp() {
+        this.setupTheme();
+        this.setupNewsFilters();
+        this.setupKeyboardShortcuts();
+        this.setupIntersectionObserver();
+        this.setupProgressBars();
+        this.setupExportFeature();
+    }
+
+    // Theme Management
+    setupTheme() {
+        const savedTheme = localStorage.getItem('weekly-report-theme') || 'light';
+        this.setTheme(savedTheme);
     }
 
     setTheme(theme) {
-        this.theme = theme;
+        this.currentTheme = theme;
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        this.updateThemeButton();
+        localStorage.setItem('weekly-report-theme', theme);
+        
+        const themeButton = document.querySelector('.theme-toggle');
+        const icon = themeButton.querySelector('i');
+        const text = themeButton.querySelector('span');
+        
+        if (theme === 'dark') {
+            icon.className = 'fas fa-sun';
+            text.textContent = 'ライトモード';
+        } else {
+            icon.className = 'fas fa-moon';
+            text.textContent = 'ダークモード';
+        }
     }
 
     toggleTheme() {
-        const newTheme = this.theme === 'light' ? 'dark' : 'light';
+        const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         this.setTheme(newTheme);
     }
 
-    updateThemeButton() {
-        const button = document.getElementById('themeToggle');
-        const icon = button.querySelector('i');
-        
-        if (this.theme === 'dark') {
-            icon.className = 'fas fa-sun';
-            button.setAttribute('aria-label', 'ライトモードに切り替え');
-        } else {
-            icon.className = 'fas fa-moon';
-            button.setAttribute('aria-label', 'ダークモードに切り替え');
-        }
-    }
+    // News Filtering
+    setupNewsFilters() {
+        const filterButtons = document.querySelectorAll('.category-btn');
+        const newsCards = document.querySelectorAll('.news-card');
 
-    bindEvents() {
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => this.toggleTheme());
-    }
-}
-
-// News Filter Manager
-class NewsFilterManager {
-    constructor() {
-        this.activeCategory = 'all';
-        this.init();
-    }
-
-    init() {
-        this.bindEvents();
-        this.filterNews(this.activeCategory);
-    }
-
-    bindEvents() {
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const category = e.target.getAttribute('data-category');
-                this.setActiveCategory(category);
-                this.filterNews(category);
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                this.filterNews(category, filterButtons, newsCards);
             });
         });
     }
 
-    setActiveCategory(category) {
-        // Remove active class from all buttons
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
+    filterNews(category, buttons, cards) {
+        this.currentFilter = category;
+        
+        // Update button states
+        buttons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === category);
         });
 
-        // Add active class to clicked button
-        document.querySelector(`[data-category="${category}"]`).classList.add('active');
-        this.activeCategory = category;
-    }
-
-    filterNews(category) {
-        const newsCards = document.querySelectorAll('.news-card');
-        
-        newsCards.forEach(card => {
-            const cardCategory = card.getAttribute('data-category');
+        // Filter cards with animation
+        cards.forEach(card => {
+            const cardCategory = card.dataset.category;
+            const shouldShow = category === 'all' || cardCategory === category;
             
-            if (category === 'all' || cardCategory === category) {
+            if (shouldShow) {
                 card.style.display = 'block';
-                card.style.animation = 'fadeInUp 0.4s ease-out';
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 50);
             } else {
-                card.style.display = 'none';
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 200);
             }
         });
-
-        this.updateNewsCount();
     }
 
-    updateNewsCount() {
-        const visibleCards = document.querySelectorAll('.news-card[style*="block"]').length;
-        const totalCards = document.querySelectorAll('.news-card').length;
-        
-        // Update section subtitle with count
-        const subtitle = document.querySelector('.section:last-of-type .section-subtitle');
-        if (this.activeCategory === 'all') {
-            subtitle.textContent = `AI業界の最新動向（${totalCards}件）`;
-        } else {
-            subtitle.textContent = `AI業界の最新動向（${visibleCards}件表示）`;
-        }
-    }
-}
+    // Keyboard Shortcuts
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
 
-// Progress Bar Animation
-class ProgressBarAnimator {
-    constructor() {
-        this.init();
+            switch(e.key.toLowerCase()) {
+                case 't':
+                    e.preventDefault();
+                    this.toggleTheme();
+                    break;
+                case 'e':
+                    e.preventDefault();
+                    this.exportReport();
+                    break;
+                case '1':
+                    e.preventDefault();
+                    this.filterNewsByKey('all');
+                    break;
+                case '2':
+                    e.preventDefault();
+                    this.filterNewsByKey('openai');
+                    break;
+                case '3':
+                    e.preventDefault();
+                    this.filterNewsByKey('gemini');
+                    break;
+                case '4':
+                    e.preventDefault();
+                    this.filterNewsByKey('other');
+                    break;
+            }
+        });
     }
 
-    init() {
-        this.animateProgressBars();
+    filterNewsByKey(category) {
+        const buttons = document.querySelectorAll('.category-btn');
+        const cards = document.querySelectorAll('.news-card');
+        this.filterNews(category, buttons, cards);
     }
 
-    animateProgressBars() {
-        const progressBars = document.querySelectorAll('.progress-fill');
-        
-        // Use Intersection Observer for scroll-triggered animations
+    // Intersection Observer for Animations
+    setupIntersectionObserver() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const progressBar = entry.target;
-                    const width = progressBar.style.width;
-                    
-                    // Reset width and animate
-                    progressBar.style.width = '0%';
-                    setTimeout(() => {
-                        progressBar.style.width = width;
-                    }, 100);
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                 }
             });
-        }, {
-            threshold: 0.5
+        }, observerOptions);
+
+        // Observe all animated elements
+        const animatedElements = document.querySelectorAll('.metric-card, .stock-card, .news-card, .schedule-item');
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(10px)';
+            el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            observer.observe(el);
+        });
+    }
+
+    // Progress Bar Animations
+    setupProgressBars() {
+        const progressBars = document.querySelectorAll('.progress-fill');
+        
+        const animateProgressBar = (bar) => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 500);
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateProgressBar(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
         });
 
         progressBars.forEach(bar => observer.observe(bar));
     }
-}
 
-// Metric Card Hover Effects
-class MetricCardEnhancer {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.addHoverEffects();
-        this.addClickEffects();
-    }
-
-    addHoverEffects() {
-        const metricCards = document.querySelectorAll('.metric-card');
-        
-        metricCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-4px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-    }
-
-    addClickEffects() {
-        const metricCards = document.querySelectorAll('.metric-card');
-        
-        metricCards.forEach(card => {
-            card.addEventListener('click', () => {
-                // Add pulse effect
-                card.style.animation = 'pulse 0.3s ease-in-out';
-                setTimeout(() => {
-                    card.style.animation = '';
-                }, 300);
-            });
-        });
-    }
-}
-
-// Export Functionality
-class ExportManager {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        const exportBtn = document.querySelector('.export-btn');
-        exportBtn.addEventListener('click', () => this.exportReport());
+    // Export Feature
+    setupExportFeature() {
+        // Export functionality will be implemented here
     }
 
     exportReport() {
-        // Show loading state
-        const exportBtn = document.querySelector('.export-btn');
-        const originalText = exportBtn.innerHTML;
-        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> エクスポート中...';
-        exportBtn.disabled = true;
+        // Create a simplified version for export
+        const reportData = {
+            date: new Date().toLocaleDateString('ja-JP'),
+            metrics: this.extractMetricsData(),
+            stocks: this.extractStockData(),
+            news: this.extractNewsData(),
+            schedule: this.extractScheduleData()
+        };
 
-        // Simulate export process
-        setTimeout(() => {
-            this.generatePDF();
-            
-            // Reset button
-            exportBtn.innerHTML = originalText;
-            exportBtn.disabled = false;
-        }, 2000);
-    }
-
-    generatePDF() {
-        // In a real implementation, you would use a library like jsPDF or Puppeteer
-        // For now, we'll create a simple text export
-        const reportData = this.collectReportData();
-        const blob = new Blob([reportData], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
+        // Convert to JSON and download
+        const dataStr = JSON.stringify(reportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
         
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `週次レポート_${new Date().toISOString().split('T')[0]}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `weekly-report-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
         URL.revokeObjectURL(url);
-
+        
         // Show success message
-        this.showNotification('レポートがエクスポートされました', 'success');
+        this.showNotification('レポートをエクスポートしました', 'success');
     }
 
-    collectReportData() {
-        const title = document.querySelector('.header-title h1').textContent;
-        const date = document.querySelector('.header-date').textContent;
-        
-        let reportText = `${title} - ${date}\n\n`;
-        
-        // Business metrics
-        reportText += "=== ビジネス実績 ===\n";
+    extractMetricsData() {
+        const metrics = [];
         const metricCards = document.querySelectorAll('.metric-card');
+        
         metricCards.forEach(card => {
-            const serviceName = card.querySelector('.metric-title h3').textContent;
-            const metricType = card.querySelector('.metric-type').textContent;
-            const value = card.querySelector('.value-number').textContent + card.querySelector('.value-unit').textContent;
-            const changes = Array.from(card.querySelectorAll('.change-item')).map(item => item.textContent).join(', ');
+            const title = card.querySelector('.metric-title h3').textContent;
+            const value = card.querySelector('.value-number').textContent;
+            const unit = card.querySelector('.value-unit').textContent;
+            const changes = Array.from(card.querySelectorAll('.change-item')).map(item => 
+                item.textContent.trim()
+            );
             
-            reportText += `${serviceName} (${metricType}): ${value} - ${changes}\n`;
+            metrics.push({ title, value, unit, changes });
         });
+        
+        return metrics;
+    }
 
-        // Stock data
-        reportText += "\n=== 株価情報 ===\n";
+    extractStockData() {
+        const stocks = [];
         const stockCards = document.querySelectorAll('.stock-card');
+        
         stockCards.forEach(card => {
-            const stockName = card.querySelector('.stock-header h3').textContent;
+            const name = card.querySelector('.stock-header h3').textContent;
             const symbol = card.querySelector('.stock-symbol').textContent;
             const price = card.querySelector('.price-value').textContent;
-            const change = card.querySelector('.price-change').textContent;
+            const change = card.querySelector('.price-change span').textContent;
             
-            reportText += `${stockName} (${symbol}): ${price} ${change}\n`;
+            stocks.push({ name, symbol, price, change });
         });
+        
+        return stocks;
+    }
 
-        // Schedule
-        reportText += "\n=== 今週のスケジュール ===\n";
+    extractNewsData() {
+        const news = [];
+        const newsCards = document.querySelectorAll('.news-card');
+        
+        newsCards.forEach(card => {
+            const category = card.querySelector('.news-category').textContent;
+            const title = card.querySelector('.news-title').textContent;
+            const excerpt = card.querySelector('.news-excerpt').textContent;
+            const time = card.querySelector('.news-time').textContent;
+            
+            news.push({ category, title, excerpt, time });
+        });
+        
+        return news;
+    }
+
+    extractScheduleData() {
+        const schedule = [];
         const scheduleItems = document.querySelectorAll('.schedule-item');
+        
         scheduleItems.forEach(item => {
-            const date = item.querySelector('.date-day').textContent + ' ' + item.querySelector('.date-month').textContent;
+            const day = item.querySelector('.date-day').textContent;
+            const month = item.querySelector('.date-month').textContent;
             const title = item.querySelector('.schedule-content h3').textContent;
-            const time = item.querySelector('.schedule-time').textContent;
+            const time = item.querySelector('.schedule-time span').textContent;
             
-            reportText += `${date}: ${title} ${time}\n`;
+            schedule.push({ day, month, title, time });
         });
-
-        return reportText;
+        
+        return schedule;
     }
 
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-            <i class="fas fa-check-circle"></i>
-            <span>${message}</span>
-        `;
+        notification.textContent = message;
         
         notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--success);
+            padding: 12px 24px;
+            border-radius: 8px;
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
+            font-weight: 500;
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: slideInRight 0.3s ease-out;
+            transition: all 0.3s ease;
+            transform: translateX(100%);
         `;
-
+        
+        if (type === 'success') {
+            notification.style.backgroundColor = '#10b981';
+        } else if (type === 'error') {
+            notification.style.backgroundColor = '#ef4444';
+        } else {
+            notification.style.backgroundColor = '#3b82f6';
+        }
+        
         document.body.appendChild(notification);
-
+        
+        // Animate in
         setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after delay
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
             setTimeout(() => {
                 document.body.removeChild(notification);
             }, 300);
@@ -311,112 +318,72 @@ class ExportManager {
     }
 }
 
-// Keyboard Navigation
-class KeyboardNavigationManager {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.bindKeyboardEvents();
-    }
-
-    bindKeyboardEvents() {
-        document.addEventListener('keydown', (e) => {
-            // Theme toggle with 'T' key
-            if (e.key === 't' || e.key === 'T') {
-                if (!e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    document.getElementById('themeToggle').click();
-                }
-            }
-
-            // Export with 'E' key
-            if (e.key === 'e' || e.key === 'E') {
-                if (!e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    document.querySelector('.export-btn').click();
-                }
-            }
-
-            // News filter with number keys
-            if (e.key >= '1' && e.key <= '4') {
-                if (!e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    const categories = ['all', 'openai', 'gemini', 'other'];
-                    const categoryIndex = parseInt(e.key) - 1;
-                    if (categories[categoryIndex]) {
-                        document.querySelector(`[data-category="${categories[categoryIndex]}"]`).click();
-                    }
-                }
-            }
-        });
-    }
+// Global functions for HTML onclick handlers
+function toggleTheme() {
+    window.reportApp.toggleTheme();
 }
 
-// Add custom CSS animations
-const additionalStyles = `
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+function exportReport() {
+    window.reportApp.exportReport();
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-
-.metric-card {
-    cursor: pointer;
-}
-
-.metric-card:active {
-    transform: translateY(-2px) scale(0.98);
-}
-`;
-
-// Initialize all managers when DOM is loaded
+// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Add additional styles
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = additionalStyles;
-    document.head.appendChild(styleSheet);
+    window.reportApp = new WeeklyReportApp();
+});
 
-    // Initialize all functionality
-    new ThemeManager();
-    new NewsFilterManager();
-    new ProgressBarAnimator();
-    new MetricCardEnhancer();
-    new ExportManager();
-    new KeyboardNavigationManager();
+// Handle window resize for responsive adjustments
+window.addEventListener('resize', () => {
+    // Adjust layout if needed for responsive design
+    const container = document.querySelector('.container');
+    if (window.innerWidth < 768) {
+        container.classList.add('mobile-layout');
+    } else {
+        container.classList.remove('mobile-layout');
+    }
+});
 
-    // Add keyboard shortcuts help
-    const helpText = document.createElement('div');
-    helpText.innerHTML = `
-        <div style="position: fixed; bottom: 20px; left: 20px; font-size: 0.75rem; color: var(--text-tertiary); opacity: 0.7;">
-            キーボードショートカット: T (テーマ切り替え) | E (エクスポート) | 1-4 (ニュースフィルター)
-        </div>
-    `;
-    document.body.appendChild(helpText);
+// Performance optimization: Debounce scroll events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-    console.log('📊 週次レポートWebページが初期化されました');
-    console.log('🎯 キーボードショートカット: T=テーマ切り替え, E=エクスポート, 1-4=ニュースフィルター');
-}); 
+// Smooth scrolling for anchor links
+document.addEventListener('click', (e) => {
+    if (e.target.matches('a[href^="#"]')) {
+        e.preventDefault();
+        const target = document.querySelector(e.target.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
+});
+
+// Add loading states for dynamic content
+function showLoading(element) {
+    element.style.opacity = '0.6';
+    element.style.pointerEvents = 'none';
+}
+
+function hideLoading(element) {
+    element.style.opacity = '1';
+    element.style.pointerEvents = 'auto';
+}
+
+// Console welcome message
+console.log('%c📊 週次レポート Dashboard', 'color: #3b82f6; font-size: 16px; font-weight: bold;');
+console.log('%cキーボードショートカット:', 'color: #6b7280; font-size: 14px;');
+console.log('%c  T: テーマ切り替え', 'color: #6b7280; font-size: 12px;');
+console.log('%c  E: エクスポート', 'color: #6b7280; font-size: 12px;');
+console.log('%c  1-4: ニュースフィルター', 'color: #6b7280; font-size: 12px;'); 
