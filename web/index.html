@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>週次レポート - 2025年06月20日</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>週次レポート</h1>
+                    <p class="header-date">2025年06月20日</p>
+                </div>
+                <div class="header-controls">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="export-btn">
+                        <i class="fas fa-download"></i>
+                        エクスポート
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Business Metrics -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> ビジネス実績</h2>
+                <p class="section-subtitle">主要指標の週次パフォーマンス</p>
+            </div>
+            
+            <div class="metrics-grid">
+                <!-- Placement Card -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">
+                            <h3>Placement</h3>
+                            <span class="metric-type">内定数</span>
+                        </div>
+                        <div class="metric-icon placement">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value">
+                        <span class="value-number">2,739</span>
+                        <span class="value-unit">件</span>
+                    </div>
+                    <div class="metric-changes">
+                        <div class="change-item negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>前年同期比 -6.1%</span>
+                        </div>
+                        <div class="change-item positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>前週比 +7.4%</span>
+                        </div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 74%"></div>
+                        </div>
+                        <span class="progress-label">週間目標達成率 74%</span>
+                    </div>
+                </div>
+
+                <!-- Online Platform Card -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">
+                            <h3>Online Platform</h3>
+                            <span class="metric-type">売上</span>
+                        </div>
+                        <div class="metric-icon online-platform">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value">
+                        <span class="value-number">¥1.18</span>
+                        <span class="value-unit">B</span>
+                    </div>
+                    <div class="metric-changes">
+                        <div class="change-item negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>前年同期比 -53.2%</span>
+                        </div>
+                        <div class="change-item negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>前週比 -69.9%</span>
+                        </div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill warning" style="width: 31%"></div>
+                        </div>
+                        <span class="progress-label">週間目標達成率 31%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stock Information -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-candlestick"></i> 株価情報</h2>
+                <p class="section-subtitle">主要銘柄の最新動向</p>
+            </div>
+            
+            <div class="stock-grid">
+                <div class="stock-card">
+                    <div class="stock-header">
+                        <h3>日経平均株価</h3>
+                        <span class="stock-symbol">N225</span>
+                    </div>
+                    <div class="stock-price">
+                        <span class="price-value">$38,000.00</span>
+                        <div class="price-change neutral">
+                            <i class="fas fa-minus"></i>
+                            <span>$0.00 (0.00%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stock-card">
+                    <div class="stock-header">
+                        <h3>S&P 500 ETF</h3>
+                        <span class="stock-symbol">SPY</span>
+                    </div>
+                    <div class="stock-price">
+                        <span class="price-value">$597.44</span>
+                        <div class="price-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-$0.09 (-0.02%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stock-card">
+                    <div class="stock-header">
+                        <h3>リクルートHD (ADR)</h3>
+                        <span class="stock-symbol">RCRUY</span>
+                    </div>
+                    <div class="stock-price">
+                        <span class="price-value">$10.93</span>
+                        <div class="price-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+$0.23 (+2.15%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-alt"></i> 今週のスケジュール</h2>
+                <p class="section-subtitle">重要な予定とミーティング</p>
+            </div>
+            
+            <div class="schedule-list">
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">24</span>
+                        <span class="date-month">Tue</span>
+                    </div>
+                    <div class="schedule-content">
+                        <h3>JP HR Steering Committee</h3>
+                        <p class="schedule-time"><i class="fas fa-clock"></i> 09:00</p>
+                    </div>
+                    <div class="schedule-status upcoming">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">25</span>
+                        <span class="date-month">Wed</span>
+                    </div>
+                    <div class="schedule-content">
+                        <h3>株主総会オンサイト</h3>
+                        <p class="schedule-time"><i class="fas fa-clock"></i> 10:00</p>
+                    </div>
+                    <div class="schedule-status important">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">27</span>
+                        <span class="date-month">Fri</span>
+                    </div>
+                    <div class="schedule-content">
+                        <h3>Bi-weekly SLT Meeting</h3>
+                        <p class="schedule-time"><i class="fas fa-clock"></i> 14:00</p>
+                    </div>
+                    <div class="schedule-status upcoming">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-newspaper"></i> 業界ニュース</h2>
+                <p class="section-subtitle">AI業界の最新動向</p>
+            </div>
+            
+            <!-- News Summary -->
+            <div class="news-summary">
+                <h3>📋 今週のサマリー</h3>
+                <p>今週のAI業界は、メタがOpenAI社員に巨額ボーナスで引き抜きを図るなど、人材競争が激化。マイクロソフトとOpenAIの連携強化も注目。長期的なAI開発への関心が高まり、グーグルの「クエリファンアウト」技術や広告業界での活用も話題に。主要企業は戦略的提携と人材確保を軸に動く中、技術革新が進むトレンドが顕著。</p>
+            </div>
+
+            <!-- News Categories -->
+            <div class="news-categories">
+                <button class="category-btn active" data-category="all">すべて</button>
+                <button class="category-btn" data-category="openai">OpenAI</button>
+                <button class="category-btn" data-category="gemini">Gemini</button>
+                <button class="category-btn" data-category="other">その他</button>
+            </div>
+
+            <!-- News Articles -->
+            <div class="news-grid" id="newsGrid">
+                <article class="news-card" data-category="openai">
+                    <div class="news-header">
+                        <span class="news-category openai">OpenAI</span>
+                        <span class="news-time">06/19 04:36</span>
+                    </div>
+                    <h3 class="news-title">Meta、OpenAI社員に巨額ボーナス提示で引き抜き</h3>
+                    <p class="news-excerpt">Sam Altman said none of his 'best people' at OpenAI were enticed by Meta's $100 million signing bonuses</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">記事を読む <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card" data-category="openai">
+                    <div class="news-header">
+                        <span class="news-category openai">OpenAI</span>
+                        <span class="news-time">06/19 04:35</span>
+                    </div>
+                    <h3 class="news-title">Microsoft-OpenAI提携に問題？</h3>
+                    <p class="news-excerpt">Microsoft-OpenAI alliance in trouble? FT report says tech giant 'prepared to walk away' from deal</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">記事を読む <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card" data-category="other">
+                    <div class="news-header">
+                        <span class="news-category other">環境</span>
+                        <span class="news-time">06/19 04:00</span>
+                    </div>
+                    <h3 class="news-title">AIプロンプトのCO₂排出量に50倍の差</h3>
+                    <p class="news-excerpt">Certain AI prompts generate 50x more CO₂ than others</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">記事を読む <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card" data-category="gemini">
+                    <div class="news-header">
+                        <span class="news-category gemini">Gemini</span>
+                        <span class="news-time">06/19 04:01</span>
+                    </div>
+                    <h3 class="news-title">GoogleのAIモード「クエリファンアウト」とは？</h3>
+                    <p class="news-excerpt">WTF is 'query fan-out' in Google's AI mode?</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">記事を読む <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><strong>生成日時:</strong> 2025-06-20 14:14:43</p>
+                    <p><strong>データソース:</strong> 売上データ（CSV）、Alpha Vantage API（株価）、NewsAPI（ニュース）、Outlook（スケジュール）</p>
+                </div>
+                <div class="footer-badge">
+                    <i class="fas fa-robot"></i>
+                    <span>自動生成レポート</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
