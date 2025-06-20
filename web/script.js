@@ -30,32 +30,73 @@ class WeeklyReportApp {
     async loadNewsData() {
         // 実際のMDファイルからニュースデータを読み込む
         try {
-            // 最新のレポートファイルからニュースデータを抽出
-            // 実際の実装では、バックエンドAPIまたはファイル読み込みが必要
+            // JSONファイルから最新のニュースデータを読み込み
+            const response = await fetch('news-data.json');
+            if (response.ok) {
+                const data = await response.json();
+                this.newsData = data.articles || [];
+                
+                // サマリーも更新
+                const summaryElement = document.querySelector('.news-summary p');
+                if (summaryElement && data.summary) {
+                    summaryElement.textContent = data.summary;
+                }
+                
+                console.log(`✅ ニュースデータ読み込み完了: ${this.newsData.length}件`);
+                console.log(`📅 生成日時: ${data.generated_at}`);
+                return;
+            }
+            
+            // フォールバック: JSONファイルが読み込めない場合
+            console.warn('⚠️ news-data.jsonが読み込めません。フォールバックデータを使用します。');
             this.newsData = [
                 {
                     category: 'openai',
-                    title: 'U.S. unemployment claims dip to 245,000, hovering at historically low levels',
-                    summary: 'AI業界: U...',
-                    url: 'https://biztoc.com/x/4e862fb2dbfcc907',
-                    time: '06/19 07:45',
+                    title: 'Payment infrastructure startup Polar raises $10 million',
+                    summary: 'AI関連スタートアップ、大型資金調達',
+                    url: 'https://www.finextra.com/newsarticle/46179/payment-infrastructure-startup-polar-raises-10-million',
+                    time: '06/19 08:56',
                     source: 'OpenAI'
                 },
                 {
-                    category: 'other',
-                    title: 'JX Advanced Metals to Cut Copper Output and Boost Recycling',
-                    summary: 'AI業界: JX Advanced Metals to Cut Copp...',
-                    url: 'https://biztoc.com/x/8ee8fd4829079504',
-                    time: '06/19 07:45',
-                    source: 'Lovable'
+                    category: 'openai',
+                    title: 'composio-openai-agents 1.0.0rc4',
+                    summary: 'AI業界: composio-openai-agents 1...',
+                    url: 'https://pypi.org/project/composio-openai-agents/1.0.0rc4/',
+                    time: '06/19 08:07',
+                    source: 'OpenAI'
                 },
                 {
-                    category: 'other',
-                    title: 'US Focus on Auto Trade Gap Is Sticking Point for Japan Deal',
-                    summary: 'AI業界: US Focus on Auto Trade Gap Is...',
-                    url: 'https://biztoc.com/x/286de8147b1bf134',
-                    time: '06/19 07:44',
-                    source: 'Lovable'
+                    category: 'openai',
+                    title: 'composio-openai 1.0.0rc4',
+                    summary: 'AI業界: composio-openai 1...',
+                    url: 'https://pypi.org/project/composio-openai/1.0.0rc4/',
+                    time: '06/19 08:07',
+                    source: 'OpenAI'
+                },
+                {
+                    category: 'gemini',
+                    title: 'How to reduce the environmental impact of using AI',
+                    summary: 'AI業界: How to reduce the environmenta...',
+                    url: 'https://onlinejournalismblog.com/2025/06/19/how-to-reduce-the-environmental-impact-of-using-ai/',
+                    time: '06/19 08:44',
+                    source: 'Gemini'
+                },
+                {
+                    category: 'gemini',
+                    title: 'Google\'s AI Mode Now Supports Voice Chats With New \'Search Live Feature',
+                    summary: 'Google、AI新機能を発表',
+                    url: 'https://www.thurrott.com/a-i/322314/googles-ai-mode-now-supports-voice-chats-with-new-search-live-feature',
+                    time: '06/19 08:33',
+                    source: 'Gemini'
+                },
+                {
+                    category: 'gemini',
+                    title: 'gemini-model 0.2.4',
+                    summary: 'AI業界: gemini-model 0...',
+                    url: 'https://pypi.org/project/gemini-model/0.2.4/',
+                    time: '06/19 08:32',
+                    source: 'Gemini'
                 },
                 {
                     category: 'other',
@@ -82,30 +123,6 @@ class WeeklyReportApp {
                     source: 'Lovable'
                 },
                 {
-                    category: 'gemini',
-                    title: 'Daily Horoscope for June 19, 2025',
-                    summary: 'AI業界: Daily Horoscope for June 19, 2...',
-                    url: 'https://www.denverpost.com/2025/06/19/daily-horoscope-for-june-19-2025/',
-                    time: '06/19 07:00',
-                    source: 'Gemini'
-                },
-                {
-                    category: 'gemini',
-                    title: 'Google\'s New AI Feature Lets You Have Verbal Conversations With Search',
-                    summary: 'Google、AI新機能を発表',
-                    url: 'https://www.gadgets360.com/ai/news/google-app-gemini-search-live-feature-ai-mode-voice-input-support-8705983',
-                    time: '06/19 06:57',
-                    source: 'Gemini'
-                },
-                {
-                    category: 'gemini',
-                    title: 'Can you choose an AI model that harms the planet less?',
-                    summary: 'AI業界: Can you choose an AI model tha...',
-                    url: 'https://economictimes.indiatimes.com/tech/artificial-intelligence/can-you-choose-an-ai-model-that-harms-the-planet-less/articleshow/121947099.cms',
-                    time: '06/19 06:35',
-                    source: 'Gemini'
-                },
-                {
                     category: 'other',
                     title: 'Cannes Briefing: What the ad industry isn\'t saying about AI',
                     summary: 'AI業界: Cannes Briefing: What the ad i...',
@@ -122,6 +139,9 @@ class WeeklyReportApp {
                     source: 'Grok'
                 }
             ];
+
+            console.log(`✅ フォールバックデータ読み込み完了: ${this.newsData.length}件`);
+            
         } catch (error) {
             console.error('Error loading news data:', error);
             this.newsData = [];
