@@ -33,15 +33,23 @@ class WeeklyReportProcessor:
         # Online Platform（サービスB）の実データパス
         online_platform_csv = "/Users/01062544/Downloads/Revenue_jp_weekly_non-RAG_YoY&WoW.csv"
         
-        # Placement（サービスA）の内定数ダミーデータ
+        # Placement（サービスA）の内定数データ - 実データに更新
+        placement_current = 2739    # 今週の内定数
+        placement_previous_week = 2550    # 先週の内定数
+        placement_previous_year = 2916    # 昨年同期の内定数
+        
+        # 前年同期比と前週比を計算
+        placement_yoy_change = ((placement_current - placement_previous_year) / placement_previous_year) * 100
+        placement_weekly_change = ((placement_current - placement_previous_week) / placement_previous_week) * 100
+        
         placement_data = {
             "name": "Placement",
             "metric_type": "内定数",
-            "current_value": 234,  # 今週の内定数
-            "previous_year_value": 189,  # 前年同期の内定数
-            "previous_week_value": 221,  # 前週の内定数
-            "yoy_change": 23.8,  # 前年同期比
-            "weekly_change": 5.9  # 前週比
+            "current_value": placement_current,
+            "previous_year_value": placement_previous_year,
+            "previous_week_value": placement_previous_week,
+            "yoy_change": round(placement_yoy_change, 1),  # 前年同期比
+            "weekly_change": round(placement_weekly_change, 1)  # 前週比
         }
         
         # Online Platform（サービスB）の売上実データを読み込み
