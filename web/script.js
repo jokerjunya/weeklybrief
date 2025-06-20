@@ -1,18 +1,131 @@
 // Weekly Report Interactive Features
 class WeeklyReportApp {
     constructor() {
-        this.currentTheme = 'light';
+        this.isDarkMode = false;
         this.currentFilter = 'all';
-        this.initializeApp();
+        this.newsData = [];
+        
+        this.init();
     }
 
-    initializeApp() {
+    async init() {
         this.setupTheme();
-        this.setupNewsFilters();
+        this.setupEventListeners();
         this.setupKeyboardShortcuts();
+        await this.loadNewsData();
+        this.setupNewsFilters();
         this.setupIntersectionObserver();
         this.setupProgressBars();
         this.setupExportFeature();
+    }
+
+    setupEventListeners() {
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => this.toggleTheme());
+        }
+    }
+
+    async loadNewsData() {
+        // 実際のMDファイルからニュースデータを読み込む
+        try {
+            // 最新のレポートファイルからニュースデータを抽出
+            // 実際の実装では、バックエンドAPIまたはファイル読み込みが必要
+            this.newsData = [
+                {
+                    category: 'openai',
+                    title: 'U.S. unemployment claims dip to 245,000, hovering at historically low levels',
+                    summary: 'AI業界: U...',
+                    url: 'https://biztoc.com/x/4e862fb2dbfcc907',
+                    time: '06/19 07:45',
+                    source: 'OpenAI'
+                },
+                {
+                    category: 'other',
+                    title: 'JX Advanced Metals to Cut Copper Output and Boost Recycling',
+                    summary: 'AI業界: JX Advanced Metals to Cut Copp...',
+                    url: 'https://biztoc.com/x/8ee8fd4829079504',
+                    time: '06/19 07:45',
+                    source: 'Lovable'
+                },
+                {
+                    category: 'other',
+                    title: 'US Focus on Auto Trade Gap Is Sticking Point for Japan Deal',
+                    summary: 'AI業界: US Focus on Auto Trade Gap Is...',
+                    url: 'https://biztoc.com/x/286de8147b1bf134',
+                    time: '06/19 07:44',
+                    source: 'Lovable'
+                },
+                {
+                    category: 'other',
+                    title: '"Embarrassment" Of Pandas Might Be The Funniest Collective Noun In The Wild',
+                    summary: 'AI業界: "Embarrassment" Of Pandas Migh...',
+                    url: 'https://www.boredpanda.com/what-is-a-group-of-pandas-called/',
+                    time: '06/19 07:41',
+                    source: 'Lovable'
+                },
+                {
+                    category: 'other',
+                    title: 'The Waterfront Review: Topher Grace Single-Handedly Saves Netflix\'s Ozark Replacement After A Slow & Choppy Start',
+                    summary: 'AI業界: The Waterfront Review: Topher...',
+                    url: 'https://screenrant.com/the-waterfront-tv-review/',
+                    time: '06/19 07:01',
+                    source: 'Lovable'
+                },
+                {
+                    category: 'other',
+                    title: 'Holt McCallany on Mindhunter, David Fincher, and masculinity: \'My mother would\'ve berated me for trying to split the bill with a woman\'',
+                    summary: 'AI業界: Holt McCallany on Mindhunter,...',
+                    url: 'https://www.the-independent.com/arts-entertainment/tv/features/holt-mccallany-mindhunter-waterfront-netflix-b2772498.html',
+                    time: '06/19 05:07',
+                    source: 'Lovable'
+                },
+                {
+                    category: 'gemini',
+                    title: 'Daily Horoscope for June 19, 2025',
+                    summary: 'AI業界: Daily Horoscope for June 19, 2...',
+                    url: 'https://www.denverpost.com/2025/06/19/daily-horoscope-for-june-19-2025/',
+                    time: '06/19 07:00',
+                    source: 'Gemini'
+                },
+                {
+                    category: 'gemini',
+                    title: 'Google\'s New AI Feature Lets You Have Verbal Conversations With Search',
+                    summary: 'Google、AI新機能を発表',
+                    url: 'https://www.gadgets360.com/ai/news/google-app-gemini-search-live-feature-ai-mode-voice-input-support-8705983',
+                    time: '06/19 06:57',
+                    source: 'Gemini'
+                },
+                {
+                    category: 'gemini',
+                    title: 'Can you choose an AI model that harms the planet less?',
+                    summary: 'AI業界: Can you choose an AI model tha...',
+                    url: 'https://economictimes.indiatimes.com/tech/artificial-intelligence/can-you-choose-an-ai-model-that-harms-the-planet-less/articleshow/121947099.cms',
+                    time: '06/19 06:35',
+                    source: 'Gemini'
+                },
+                {
+                    category: 'other',
+                    title: 'Cannes Briefing: What the ad industry isn\'t saying about AI',
+                    summary: 'AI業界: Cannes Briefing: What the ad i...',
+                    url: 'http://digiday.com/marketing/cannes-briefing-what-the-ad-industry-isnt-saying-about-ai/',
+                    time: '06/19 04:01',
+                    source: 'Perplexity'
+                },
+                {
+                    category: 'other',
+                    title: 'Middle-aged man dressing as a little girl given license to drive a school bus—hangs a sign in window that reads \'Lolita Line\'',
+                    summary: 'AI業界: Middle-aged man dressing as a...',
+                    url: 'https://www.americanthinker.com/blog/2025/06/middle_aged_man_dressing_as_a_little_girl_given_license_to_drive_a_school_bus_hangs_a_sign_in_window_that_reads_lolita_line.html',
+                    time: '06/19 04:00',
+                    source: 'Grok'
+                }
+            ];
+        } catch (error) {
+            console.error('Error loading news data:', error);
+            this.newsData = [];
+        }
     }
 
     // Theme Management
@@ -22,7 +135,7 @@ class WeeklyReportApp {
     }
 
     setTheme(theme) {
-        this.currentTheme = theme;
+        this.isDarkMode = theme === 'dark';
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('weekly-report-theme', theme);
         
@@ -40,25 +153,49 @@ class WeeklyReportApp {
     }
 
     toggleTheme() {
-        const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        const newTheme = this.isDarkMode ? 'light' : 'dark';
         this.setTheme(newTheme);
     }
 
     // News Filtering
     setupNewsFilters() {
+        this.renderNews(); // ニュースを描画
+        
         const filterButtons = document.querySelectorAll('.category-btn');
-        const newsCards = document.querySelectorAll('.news-card');
 
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const category = button.dataset.category;
-                this.filterNews(category, filterButtons, newsCards);
+                this.filterNews(category, filterButtons);
             });
         });
     }
 
-    filterNews(category, buttons, cards) {
+    renderNews() {
+        const newsGrid = document.getElementById('newsGrid');
+        if (!newsGrid || !this.newsData.length) return;
+
+        newsGrid.innerHTML = this.newsData.map(article => `
+            <div class="news-card" data-category="${article.category}">
+                <div class="news-header">
+                    <span class="news-category ${article.category}">${article.source}</span>
+                    <span class="news-time">${article.time}</span>
+                </div>
+                <h3 class="news-title">${article.title}</h3>
+                <p class="news-excerpt">${article.summary}</p>
+                <div class="news-footer">
+                    <a href="${article.url}" class="news-link" target="_blank" rel="noopener noreferrer">
+                        <span>記事を読む</span>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    filterNews(category, buttons) {
         this.currentFilter = category;
+        const cards = document.querySelectorAll('.news-card');
         
         // Update button states
         buttons.forEach(btn => {
@@ -124,8 +261,7 @@ class WeeklyReportApp {
 
     filterNewsByKey(category) {
         const buttons = document.querySelectorAll('.category-btn');
-        const cards = document.querySelectorAll('.news-card');
-        this.filterNews(category, buttons, cards);
+        this.filterNews(category, buttons);
     }
 
     // Intersection Observer for Animations

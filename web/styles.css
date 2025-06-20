@@ -205,20 +205,10 @@ body {
   text-transform: uppercase;
   font-weight: 500;
   letter-spacing: 0.05em;
+  line-height: 1.4;
 }
 
-.metric-note {
-  font-size: 0.65rem;
-  color: var(--text-tertiary);
-  font-style: italic;
-  margin-top: var(--space-xs);
-  display: block;
-  border-left: 2px solid var(--warning);
-  padding-left: var(--space-xs);
-  background: var(--warning-light);
-  padding: var(--space-xs);
-  border-radius: var(--radius-sm);
-}
+
 
 .metric-icon {
   width: 32px;
