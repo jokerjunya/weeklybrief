@@ -4,6 +4,7 @@ class WeeklyReportApp {
         this.isDarkMode = false;
         this.currentFilter = 'all';
         this.newsData = [];
+        this.logoMapping = {}; // 企業ロゴマッピング
         
         this.init();
     }
@@ -12,6 +13,7 @@ class WeeklyReportApp {
         this.setupTheme();
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
+        await this.loadLogoMapping();
         await this.loadNewsData();
         this.setupNewsFilters();
         this.setupIntersectionObserver();
@@ -27,125 +29,146 @@ class WeeklyReportApp {
         }
     }
 
-    async loadNewsData() {
-        // 実際のMDファイルからニュースデータを読み込む
+    async loadLogoMapping() {
         try {
-            // JSONファイルから最新のニュースデータを読み込み
+            const response = await fetch('logos/logo_mapping.json');
+            if (response.ok) {
+                this.logoMapping = await response.json();
+                console.log('✅ ロゴマッピング読み込み完了:', Object.keys(this.logoMapping).length + '社');
+            } else {
+                console.warn('⚠️ ロゴマッピングファイルが見つかりません');
+                this.logoMapping = {};
+            }
+        } catch (error) {
+            console.warn('⚠️ ロゴマッピング読み込みエラー:', error);
+            this.logoMapping = {};
+        }
+    }
+
+    async loadNewsData() {
+        try {
             const response = await fetch('news-data.json');
             if (response.ok) {
-                const data = await response.json();
-                this.newsData = data.articles || [];
+                this.newsData = await response.json();
                 
-                // サマリーも更新
-                const summaryElement = document.querySelector('.news-summary p');
-                if (summaryElement && data.summary) {
-                    summaryElement.textContent = data.summary;
-                }
+                // 各記事に企業情報とロゴパスを追加
+                this.newsData = this.newsData.map(article => {
+                    const companyId = this.getCompanyFromTitle(article.title);
+                    const logoInfo = this.logoMapping[companyId];
+                    
+                    return {
+                        ...article,
+                        companyId: companyId,
+                        companyName: logoInfo ? logoInfo.name : 'その他',
+                        logoPath: logoInfo ? logoInfo.path : (this.logoMapping['other'] ? this.logoMapping['other'].path : null)
+                    };
+                });
                 
-                console.log(`✅ ニュースデータ読み込み完了: ${this.newsData.length}件`);
-                console.log(`📅 生成日時: ${data.generated_at}`);
-                return;
+                console.log('✅ ニュースデータ読み込み完了:', this.newsData.length + '件');
+                this.updateNewsStats();
+            } else {
+                throw new Error('Failed to load news data');
             }
-            
-            // フォールバック: JSONファイルが読み込めない場合
-            console.warn('⚠️ news-data.jsonが読み込めません。フォールバックデータを使用します。');
-            this.newsData = [
-                {
-                    category: 'openai',
-                    title: 'Payment infrastructure startup Polar raises $10 million',
-                    summary: 'AI関連スタートアップ、大型資金調達',
-                    url: 'https://www.finextra.com/newsarticle/46179/payment-infrastructure-startup-polar-raises-10-million',
-                    time: '06/19 08:56',
-                    source: 'OpenAI'
-                },
-                {
-                    category: 'openai',
-                    title: 'composio-openai-agents 1.0.0rc4',
-                    summary: 'AI業界: composio-openai-agents 1...',
-                    url: 'https://pypi.org/project/composio-openai-agents/1.0.0rc4/',
-                    time: '06/19 08:07',
-                    source: 'OpenAI'
-                },
-                {
-                    category: 'openai',
-                    title: 'composio-openai 1.0.0rc4',
-                    summary: 'AI業界: composio-openai 1...',
-                    url: 'https://pypi.org/project/composio-openai/1.0.0rc4/',
-                    time: '06/19 08:07',
-                    source: 'OpenAI'
-                },
-                {
-                    category: 'gemini',
-                    title: 'How to reduce the environmental impact of using AI',
-                    summary: 'AI業界: How to reduce the environmenta...',
-                    url: 'https://onlinejournalismblog.com/2025/06/19/how-to-reduce-the-environmental-impact-of-using-ai/',
-                    time: '06/19 08:44',
-                    source: 'Gemini'
-                },
-                {
-                    category: 'gemini',
-                    title: 'Google\'s AI Mode Now Supports Voice Chats With New \'Search Live Feature',
-                    summary: 'Google、AI新機能を発表',
-                    url: 'https://www.thurrott.com/a-i/322314/googles-ai-mode-now-supports-voice-chats-with-new-search-live-feature',
-                    time: '06/19 08:33',
-                    source: 'Gemini'
-                },
-                {
-                    category: 'gemini',
-                    title: 'gemini-model 0.2.4',
-                    summary: 'AI業界: gemini-model 0...',
-                    url: 'https://pypi.org/project/gemini-model/0.2.4/',
-                    time: '06/19 08:32',
-                    source: 'Gemini'
-                },
-                {
-                    category: 'other',
-                    title: '"Embarrassment" Of Pandas Might Be The Funniest Collective Noun In The Wild',
-                    summary: 'AI業界: "Embarrassment" Of Pandas Migh...',
-                    url: 'https://www.boredpanda.com/what-is-a-group-of-pandas-called/',
-                    time: '06/19 07:41',
-                    source: 'Lovable'
-                },
-                {
-                    category: 'other',
-                    title: 'The Waterfront Review: Topher Grace Single-Handedly Saves Netflix\'s Ozark Replacement After A Slow & Choppy Start',
-                    summary: 'AI業界: The Waterfront Review: Topher...',
-                    url: 'https://screenrant.com/the-waterfront-tv-review/',
-                    time: '06/19 07:01',
-                    source: 'Lovable'
-                },
-                {
-                    category: 'other',
-                    title: 'Holt McCallany on Mindhunter, David Fincher, and masculinity: \'My mother would\'ve berated me for trying to split the bill with a woman\'',
-                    summary: 'AI業界: Holt McCallany on Mindhunter,...',
-                    url: 'https://www.the-independent.com/arts-entertainment/tv/features/holt-mccallany-mindhunter-waterfront-netflix-b2772498.html',
-                    time: '06/19 05:07',
-                    source: 'Lovable'
-                },
-                {
-                    category: 'other',
-                    title: 'Cannes Briefing: What the ad industry isn\'t saying about AI',
-                    summary: 'AI業界: Cannes Briefing: What the ad i...',
-                    url: 'http://digiday.com/marketing/cannes-briefing-what-the-ad-industry-isnt-saying-about-ai/',
-                    time: '06/19 04:01',
-                    source: 'Perplexity'
-                },
-                {
-                    category: 'other',
-                    title: 'Middle-aged man dressing as a little girl given license to drive a school bus—hangs a sign in window that reads \'Lolita Line\'',
-                    summary: 'AI業界: Middle-aged man dressing as a...',
-                    url: 'https://www.americanthinker.com/blog/2025/06/middle_aged_man_dressing_as_a_little_girl_given_license_to_drive_a_school_bus_hangs_a_sign_in_window_that_reads_lolita_line.html',
-                    time: '06/19 04:00',
-                    source: 'Grok'
-                }
-            ];
-
-            console.log(`✅ フォールバックデータ読み込み完了: ${this.newsData.length}件`);
-            
         } catch (error) {
-            console.error('Error loading news data:', error);
-            this.newsData = [];
+            console.error('ニュースデータの読み込みに失敗しました:', error);
+            document.getElementById('news-container').innerHTML = 
+                '<p class="error">ニュースデータの読み込みに失敗しました。</p>';
         }
+    }
+
+    getCompanyFromTitle(title) {
+        /*
+        記事タイトルから企業を特定（ロゴダウンローダーと同じロジック）
+        
+        Args:
+            title (str): 記事タイトル
+        
+        Returns:
+            str: 企業ID（見つからない場合は'other'）
+        */
+        const titleLower = title.toLowerCase();
+        
+        // 企業キーワードマッピング（logo_downloader.pyと同期）
+        const companyKeywords = {
+            "openai": ["openai", "open ai", "chatgpt", "gpt-4", "gpt-3", "gpt", "sam altman"],
+            "google": ["google", "alphabet", "bard", "palm", "lamda", "deepmind", "waymo", "gemini"],
+            "microsoft": ["microsoft", "azure", "copilot", "bing", "satya nadella"],
+            "anthropic": ["anthropic", "claude", "constitutional ai"],
+            "meta": ["meta", "facebook", "instagram", "whatsapp", "llama", "mark zuckerberg"],
+            "nvidia": ["nvidia", "jensen huang", "gpu", "cuda", "tegra"],
+            "apple": ["apple", "siri", "ios", "iphone", "ipad", "mac", "tim cook"],
+            "amazon": ["amazon", "aws", "alexa", "kindle", "prime", "jeff bezos"],
+            "tesla": ["tesla", "elon musk", "model s", "model 3", "model y", "model x", "cybertruck"],
+            "spacex": ["spacex", "falcon", "dragon", "starship", "starlink"],
+            "polar": ["polar"],
+            "netflix": ["netflix", "streaming"],
+            "gemini": ["gemini", "bard", "google ai"]
+        };
+        
+        // タイトルから企業を特定
+        for (const [companyId, keywords] of Object.entries(companyKeywords)) {
+            if (keywords.some(keyword => titleLower.includes(keyword))) {
+                return companyId;
+            }
+        }
+        
+        return "other";
+    }
+
+    formatDate(dateString) {
+        /*
+        日付文字列を日本語形式にフォーマット（時間なし）
+        
+        Args:
+            dateString (string): ISO形式の日付文字列
+        
+        Returns:
+            string: フォーマットされた日付（MM/DD (曜日)形式）
+        */
+        try {
+            const date = new Date(dateString);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            
+            // 曜日を日本語で取得
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+            const weekday = weekdays[date.getDay()];
+            
+            return `${month}/${day} (${weekday})`;
+        } catch (error) {
+            console.warn('日付フォーマットエラー:', error);
+            return dateString;
+        }
+    }
+
+    getFilteredNews() {
+        if (this.currentFilter === 'all') {
+            return this.newsData;
+        }
+        return this.newsData.filter(article => article.category === this.currentFilter);
+    }
+
+    truncateText(text, maxLength) {
+        if (!text || text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    getCategoryIcon(category) {
+        const icons = {
+            'openai': '🤖',
+            'gemini': '💎',
+            'other': '📰'
+        };
+        return icons[category] || '📰';
+    }
+
+    getCategoryName(category) {
+        const names = {
+            'openai': 'OpenAI',
+            'gemini': 'Gemini',
+            'other': 'その他'
+        };
+        return names[category] || 'その他';
     }
 
     // Theme Management
@@ -192,25 +215,106 @@ class WeeklyReportApp {
     }
 
     renderNews() {
-        const newsGrid = document.getElementById('newsGrid');
-        if (!newsGrid || !this.newsData.length) return;
+        const container = document.getElementById('news-container');
+        const filteredNews = this.getFilteredNews();
+        
+        if (filteredNews.length === 0) {
+            container.innerHTML = `
+                <div class="news-empty">
+                    <p>フィルター条件に一致するニュースがありません。</p>
+                    <button onclick="app.setFilter('all')" class="btn-reset">すべて表示</button>
+                </div>
+            `;
+            return;
+        }
 
-        newsGrid.innerHTML = this.newsData.map(article => `
-            <div class="news-card" data-category="${article.category}">
-                <div class="news-header">
-                    <span class="news-category ${article.category}">${article.source}</span>
-                    <span class="news-time">${article.time}</span>
+        container.innerHTML = filteredNews.map(article => `
+            <article class="news-item" data-category="${article.category}">
+                <div class="news-item-header">
+                    ${this.renderCompanyLogo(article)}
+                    <div class="news-item-meta">
+                        <div class="news-item-company">${article.companyName || '企業情報なし'}</div>
+                        <div class="news-item-date">${this.formatDate(article.published_at)}</div>
+                    </div>
                 </div>
-                <h3 class="news-title">${article.title}</h3>
-                <p class="news-excerpt">${article.summary}</p>
-                <div class="news-footer">
-                    <a href="${article.url}" class="news-link" target="_blank" rel="noopener noreferrer">
-                        <span>記事を読む</span>
-                        <i class="fas fa-external-link-alt"></i>
+                <h3 class="news-item-title">
+                    <a href="${article.url}" target="_blank" rel="noopener noreferrer">
+                        ${article.title}
                     </a>
+                </h3>
+                ${article.summary_jp ? `
+                    <div class="news-item-summary">
+                        <span class="summary-label">🇯🇵 要約:</span>
+                        <span class="summary-text">${article.summary_jp}</span>
+                    </div>
+                ` : ''}
+                ${article.description ? `
+                    <p class="news-item-description">${this.truncateText(article.description, 150)}</p>
+                ` : ''}
+                <div class="news-item-footer">
+                    <span class="news-item-category" data-category="${article.category}">
+                        ${this.getCategoryIcon(article.category)} ${this.getCategoryName(article.category)}
+                    </span>
+                    <span class="news-item-source">${article.keyword || 'ニュース'}</span>
                 </div>
-            </div>
+            </article>
         `).join('');
+    }
+
+    renderCompanyLogo(article) {
+        /*
+        企業ロゴを表示するHTMLを生成
+        
+        Args:
+            article: ニュース記事オブジェクト
+        
+        Returns:
+            string: ロゴ表示HTML
+        */
+        if (!article.logoPath) {
+            // ロゴがない場合はデフォルトアイコン
+            return `
+                <div class="news-item-logo news-item-logo-default">
+                    <div class="logo-placeholder">
+                        ${this.getCompanyInitial(article.companyName)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ロゴ画像を表示
+        const logoAlt = `${article.companyName || 'Company'} logo`;
+        return `
+            <div class="news-item-logo">
+                <img 
+                    src="${article.logoPath}" 
+                    alt="${logoAlt}"
+                    title="${article.companyName}"
+                    onerror="this.parentNode.innerHTML='<div class=\\"logo-placeholder\\">${this.getCompanyInitial(article.companyName)}</div>'"
+                >
+            </div>
+        `;
+    }
+
+    getCompanyInitial(companyName) {
+        /*
+        企業名の頭文字を取得（ロゴが表示できない場合のフォールバック）
+        
+        Args:
+            companyName (string): 企業名
+        
+        Returns:
+            string: 頭文字
+        */
+        if (!companyName) return '?';
+        
+        // 日本語企業名の場合は最初の文字
+        if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(companyName)) {
+            return companyName.charAt(0);
+        }
+        
+        // 英語企業名の場合は頭文字
+        return companyName.charAt(0).toUpperCase();
     }
 
     filterNews(category, buttons) {
@@ -471,6 +575,35 @@ class WeeklyReportApp {
                 document.body.removeChild(notification);
             }, 300);
         }, 3000);
+    }
+
+    updateNewsStats() {
+        if (!this.newsData || this.newsData.length === 0) return;
+
+        // カテゴリ別統計を更新
+        const stats = {
+            total: this.newsData.length,
+            openai: this.newsData.filter(n => n.category === 'openai').length,
+            gemini: this.newsData.filter(n => n.category === 'gemini').length,
+            other: this.newsData.filter(n => n.category === 'other').length
+        };
+
+        // フィルターボタンのバッジを更新
+        Object.entries(stats).forEach(([category, count]) => {
+            const badge = document.querySelector(`[data-filter="${category}"] .filter-badge`);
+            if (badge) {
+                badge.textContent = count;
+            }
+        });
+
+        // 企業別統計も更新（ロゴ表示用）
+        const companyStats = {};
+        this.newsData.forEach(article => {
+            const company = article.companyName || 'その他';
+            companyStats[company] = (companyStats[company] || 0) + 1;
+        });
+
+        console.log('📊 企業別ニュース統計:', companyStats);
     }
 }
 

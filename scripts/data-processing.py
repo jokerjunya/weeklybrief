@@ -31,7 +31,7 @@ class WeeklyReportProcessor:
         ビジネスデータを処理（Placement: 内定数、Online Platform: 売上）
         """
         # Online Platform（サービスB）の実データパス
-        online_platform_csv = "/Users/01062544/Downloads/Revenue_jp_weekly_non-RAG_YoY&WoW.csv"
+        online_platform_csv = "/Users/01062544/Downloads/Revenue_non-RAG_jp_weekly_WoW&YoY.csv"
         
         # Placement（サービスA）の内定数データ - 実データに更新
         placement_current = 2739    # 今週の内定数

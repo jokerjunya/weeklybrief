@@ -53,4 +53,9 @@ secrets/
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+
+# Confidential data files
+Revenue_*.csv
+*revenue*.csv
+*sales*.csv 

@@ -9,14 +9,14 @@
       "source_type": "OneDrive",
       "folder_path": "/Users/01062544/Downloads/",
       "folder_path_note": "本番環境ではOneDrive/SharePointのパスに変更",
-      "file_pattern": "weekly_sales_report.csv",
+      "file_pattern": "Revenue_non-RAG_jp_weekly_WoW&YoY.csv",
       "sort_by": "modified_date_desc",
       "columns": {
-        "service_name": "サービス名",
-        "current_week_sales": "今週売上額 (¥)",
-        "previous_year_sales": "前年同週売上額 (¥)",
-        "yoy_change": "YoY増減率 (%)",
-        "weekly_change": "前週比 (%)"
+        "this_week_revenue_jpy": "今週売上額 (¥)",
+        "last_week_revenue_jpy": "前週売上額 (¥)",
+        "last_year_same_week_revenue_jpy": "前年同週売上額 (¥)",
+        "wow_pct": "前週比 (%)",
+        "yoy_pct": "前年比 (%)"
       }
     },
     "stock_data": {
@@ -32,7 +32,7 @@
     "news_data": {
       "api_key": "5d88b85486d641faba9a410aca9c138b",
       "url": "https://newsapi.org/v2/everything",
-      "keywords": ["Gemini", "OpenAI", "Genspark", "Anthropic", "ElevenLabs", "Perplexity", "Grok", "Lovable"]
+      "keywords": ["OpenAI", "ChatGPT", "Google Gemini", "Anthropic Claude", "AI technology", "artificial intelligence", "machine learning"]
     },
     "calendar_data": {
       "source": "Outlook",

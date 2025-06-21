@@ -218,15 +218,15 @@ def generate_news_markdown(news_data):
     return markdown
 
 def generate_schedule_markdown(schedule_data):
-    """スケジュールデータをMarkdown形式に変換"""
+    """スケジュールデータをMarkdown形式に変換（時間なし）"""
     if not schedule_data:
         return "今週はスケジュールがありません。"
     
     markdown = ""
     for item in schedule_data:
-        # 日付をフォーマット
+        # 日付のみフォーマット（時間は削除）
         start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
-        date_str = start_time.strftime("%m/%d (%a) %H:%M")
+        date_str = start_time.strftime("%m/%d (%a)")
         
         markdown += f"- **{item['subject']}**\n"
         markdown += f"  📅 {date_str}\n\n"
