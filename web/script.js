@@ -249,11 +249,8 @@ class WeeklyReportApp {
                     ${article.score ? `<span class="news-score">重要度: ${article.score}</span>` : ''}
                 </div>
                 <h3 class="news-title">
-                    ${article.title}
+                    ${article.description || article.title}
                 </h3>
-                ${article.description ? `
-                    <p class="news-excerpt">${this.truncateText(article.description, 150)}</p>
-                ` : ''}
                 <div class="news-footer">
                     <a href="${article.url}" target="_blank" class="news-link">
                         <span>詳細を読む</span>
