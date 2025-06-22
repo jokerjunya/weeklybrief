@@ -7,12 +7,13 @@
 import json
 import os
 import sys
+import asyncio
 from datetime import datetime, timedelta
 
 # data_processing.pyから必要な関数をインポート
 exec(open('scripts/data-processing.py').read())
 
-def generate_test_report():
+async def generate_test_report():
     """テスト用週次レポートを生成"""
     
     print("🚀 テストレポート生成開始")
@@ -43,16 +44,52 @@ def generate_test_report():
     valid_stocks = {k: v for k, v in stock_data.items() if "error" not in v}
     print(f"   ✅ 取得成功: {len(valid_stocks)}/{len(stock_tickers)} 銘柄")
     
-    # 3. ニュースデータ取得
-    print("📰 ニュースデータ取得中...")
-    keywords = processor.config["data_sources"]["news_data"]["keywords"]
-    news_data = processor.fetch_news_data(keywords)
-    print(f"   ✅ 記事取得: {len(news_data)}件")
+    # 3. AI駆動ニュースデータ取得
+    print("📰 AI駆動ニュースデータ取得中...")
+    weekly_summary = ""
+    period_description = ""
     
-    # 3.5. 週間ニュースサマリー生成
-    print("📋 週間ニュースサマリー生成中...")
-    weekly_summary = processor.get_weekly_news_summary(news_data)
-    print(f"   ✅ サマリー生成完了: {len(weekly_summary)}文字")
+    try:
+        # AI駆動ニュースパイプラインを実行
+        import sys
+        sys.path.append('scripts')
+        from ai_news_pipeline import AINewsPipeline
+        
+        pipeline = AINewsPipeline()
+        pipeline_result = await pipeline.run_pipeline(top_n=10)
+        
+        # パイプライン結果をニュースデータ形式に変換
+        if "error" not in pipeline_result:
+            news_data = []
+            for news in pipeline_result.get("analysis_results", []):
+                news_data.append({
+                    "title": news.get("title", ""),
+                    "url": news.get("url", ""),
+                    "keyword": news.get("company_id", "AI業界"),
+                    "published_at": news.get("published_at", ""),
+                    "summary_jp": news.get("summary_jp", ""),
+                    "description": news.get("summary", ""),
+                    "score": news.get("score", 5.0)
+                })
+            
+            # AI生成のサマリーと期間情報を取得
+            weekly_summary = pipeline_result.get("weekly_summary", "")
+            period_info = pipeline_result.get("period_info", {})
+            period_description = period_info.get("period_description", "過去1週間")
+            
+            print(f"   ✅ AI分析記事取得: {len(news_data)}件")
+            print(f"   ✅ AI生成サマリー: {len(weekly_summary)}文字")
+        else:
+            raise Exception(pipeline_result.get("error", "Unknown error"))
+            
+    except Exception as e:
+        print(f"   ⚠️ AI パイプラインエラー: {e}")
+        # フォールバック: 従来のニュースAPI
+        keywords = processor.config["data_sources"]["news_data"]["keywords"]
+        news_data = processor.fetch_news_data(keywords)
+        weekly_summary = processor.get_weekly_news_summary(news_data)
+        period_description = "過去1週間"
+        print(f"   ✅ フォールバック記事取得: {len(news_data)}件")
     
     # 4. HTMLテーブル生成
     print("🔧 HTMLテーブル生成中...")
@@ -131,6 +168,9 @@ def generate_test_report():
 
 ## 📰 業界ニュース
 
+### 📊 分析対象期間
+**{period_description}**
+
 ### 📋 今週のサマリー
 
 {weekly_summary}
@@ -146,10 +186,11 @@ def generate_test_report():
 ## 📋 レポート情報
 
 - **生成日時**: {generation_time}
+- **分析期間**: {period_description}
 - **データソース**: 
   - 売上データ（CSV）
   - Alpha Vantage API（株価）
-  - NewsAPI（ニュース）
+  - AI駆動ニュース分析（企業別RSS + NewsAPI + AI分析）
   - Outlook（スケジュール）
 
 ---
@@ -168,162 +209,279 @@ def generate_test_report():
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(report_content)
     
-    print(f"📄 レポート生成完了: {filepath}")
+    print(f"✅ レポート生成完了: {filepath}")
     
-    # 7. Web HTML生成
-    print("🌐 Web HTML生成中...")
-    web_filepath = generate_web_html(sales_data, valid_stocks, sample_schedule, news_data, weekly_summary, generation_time)
-    print(f"🌐 Web HTML生成完了: {web_filepath}")
+    # Web用HTML生成
+    print("🌐 Web用HTML生成中...")
+    web_html_content = generate_web_html(sales_data, valid_stocks, sample_schedule, news_data, weekly_summary, generation_time, period_description)
     
-    # 統計情報表示
-    print("\n📊 生成レポート統計:")
-    print(f"   ファイルサイズ: {len(report_content):,} 文字")
-    print(f"   売上データ: {len(sales_data['services'])} サービス")
-    print(f"   株価データ: {len(valid_stocks)} 銘柄")
-    print(f"   ニュース: {len(news_data)} 記事")
-    print(f"   スケジュール: {len(sample_schedule)} 予定")
+    web_filename = f"週次レポート_web_{timestamp}.html"
+    web_filepath = os.path.join("web", web_filename)
     
-    return filepath, web_filepath
+    with open(web_filepath, 'w', encoding='utf-8') as f:
+        f.write(web_html_content)
+    
+    print(f"✅ Web用HTML生成完了: {web_filepath}")
+    
+    # Web用JSON更新
+    print("📊 Web用JSON更新中...")
+    update_web_news_json(news_data)
+    print("✅ Web用JSON更新完了")
+    
+    print("\n" + "=" * 50)
+    print("🎉 テストレポート生成完了")
+    print("=" * 50)
+    print(f"📄 Markdown: {filepath}")
+    print(f"🌐 Web HTML: {web_filepath}")
+    print(f"📊 Web JSON: web/news-data.json")
 
 def generate_news_markdown(news_data):
     """ニュースデータをMarkdown形式に変換"""
     if not news_data:
-        return "今週は関連ニュースがありませんでした。"
+        return "今週は重要なニュースはありませんでした。"
     
     markdown = ""
-    current_keyword = None
-    
-    # キーワード別にグループ化
-    news_by_keyword = {}
-    for article in news_data:
-        keyword = article.get('keyword', 'その他')
-        if keyword not in news_by_keyword:
-            news_by_keyword[keyword] = []
-        news_by_keyword[keyword].append(article)
-    
-    for keyword, articles in news_by_keyword.items():
-        markdown += f"\n### 🔍 {keyword} 関連\n\n"
+    for i, news in enumerate(news_data, 1):
+        # スコア表示（AI分析の場合）
+        score_text = ""
+        if news.get('score'):
+            score_text = f" (重要度: {news['score']:.1f}/10)"
         
-        for i, article in enumerate(articles[:3], 1):  # 各キーワード最大3件
-            # 日付をフォーマット
-            pub_date = datetime.fromisoformat(article['published_at'].replace('Z', '+00:00'))
-            date_str = pub_date.strftime("%m/%d %H:%M")
-            
-            markdown += f"{i}. **[{article['title']}]({article['url']})**\n"
-            
-            # 日本語要約を優先表示、なければ元の説明文
-            if article.get('summary_jp'):
-                markdown += f"   🇯🇵 **要約**: {article['summary_jp']}\n"
-            elif article.get('description'):
-                description = article['description'][:100] + "..." if len(article['description']) > 100 else article['description']
-                markdown += f"   📝 {description}\n"
-            
-            markdown += f"   *{date_str}*\n\n"
+        markdown += f"#### {i}. {news['title']}{score_text}\n\n"
+        
+        # 要約を表示（日本語要約優先）
+        summary = news.get('summary_jp', '') or news.get('description', '')
+        if summary:
+            markdown += f"**要約**: {summary}\n\n"
+        
+        # URL追加
+        if news.get('url'):
+            markdown += f"**リンク**: [記事を読む]({news['url']})\n\n"
+        
+        # 公開日追加（もしあれば）
+        if news.get('published_at'):
+            try:
+                pub_date = datetime.fromisoformat(news['published_at'].replace('Z', '+00:00'))
+                formatted_date = pub_date.strftime('%Y年%m月%d日')
+                markdown += f"**公開日**: {formatted_date}\n\n"
+            except:
+                pass
+        
+        markdown += "---\n\n"
     
     return markdown
 
 def generate_schedule_markdown(schedule_data):
-    """スケジュールデータをMarkdown形式に変換（時間なし）"""
+    """スケジュールデータをMarkdown形式に変換"""
     if not schedule_data:
-        return "今週はスケジュールがありません。"
+        return "今週の予定はありません。"
     
     markdown = ""
-    for item in schedule_data:
-        # 日付のみフォーマット（時間は削除）
-        start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
-        date_str = start_time.strftime("%m/%d (%a)")
-        
-        markdown += f"- **{item['subject']}**\n"
-        markdown += f"  📅 {date_str}\n\n"
+    for event in schedule_data:
+        try:
+            start_time = datetime.fromisoformat(event['start'].replace('Z', '+00:00'))
+            formatted_date = start_time.strftime('%m月%d日 (%a)')
+            formatted_time = start_time.strftime('%H:%M')
+            
+            markdown += f"- **{formatted_date}** {formatted_time}: {event['subject']}\n"
+        except Exception as e:
+            markdown += f"- {event['subject']}\n"
     
     return markdown
 
-def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_summary, generation_time):
-    """Web HTML ファイルを生成（履歴管理対応）"""
+def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_summary, generation_time, period_description="過去1週間"):
+    """Web表示用HTML生成"""
     
-    # 現在のindex.htmlをベースとして読み込み
-    with open('web/index.html', 'r', encoding='utf-8') as f:
-        html_content = f.read()
-    
-    # 日付を更新
-    today = datetime.now().strftime("%Y年%m月%d日")
-    html_content = html_content.replace('2025年06月22日', today)
-    
-    # スケジュール部分を更新（曜日優先表示に変更）
+    # スケジュールHTML生成
     schedule_html = generate_schedule_html(schedule_data)
     
-    # スケジュール部分を置換
-    import re
-    schedule_pattern = r'(<div class="schedule-list">)(.*?)(</div>\s*</section>)'
-    html_content = re.sub(schedule_pattern, f'\\1{schedule_html}\\3', html_content, flags=re.DOTALL)
+    # ニュースHTML生成（重要度スコア付き）
+    news_html = ""
+    for i, news in enumerate(news_data, 1):
+        score_badge = ""
+        if news.get('score'):
+            score_badge = f'<span class="score-badge">重要度: {news["score"]:.1f}</span>'
+        
+        # 要約を表示（80-120文字程度に調整）
+        summary = news.get('summary_jp', '') or news.get('description', '')
+        if len(summary) > 120:
+            summary = summary[:117] + "..."
+        
+        news_html += f"""
+        <div class="news-item">
+            <h4>{news['title']} {score_badge}</h4>
+            <p class="news-summary">{summary}</p>
+            <a href="{news.get('url', '#')}" target="_blank" class="news-link">記事を読む →</a>
+        </div>
+        """
     
-    # 履歴ファイル生成
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    web_filename = f"週次レポート_web_{timestamp}.html"
-    web_filepath = os.path.join("web", web_filename)
+    # 売上データHTML生成
+    sales_html = ""
+    for service in sales_data['services']:
+        yoy_class = "positive" if service['yoy_change'] > 0 else "negative"
+        weekly_class = "positive" if service['weekly_change'] > 0 else "negative"
+        
+        if service.get('metric_type') == '内定数':
+            current_display = f"{service['current_value']:,}件"
+        else:
+            current_display = f"¥{service['current_value']:.1f}億円"
+        
+        sales_html += f"""
+        <div class="metric-card">
+            <h3>{service['name']}</h3>
+            <p class="metric-type">{service['metric_type']}</p>
+            <p class="metric-value">{current_display}</p>
+            <div class="metric-changes">
+                <span class="change {yoy_class}">前年同期比: {service['yoy_change']:+.1f}%</span>
+                <span class="change {weekly_class}">前週比: {service['weekly_change']:+.1f}%</span>
+            </div>
+        </div>
+        """
     
-    # webディレクトリ作成
-    os.makedirs("web", exist_ok=True)
-    
-    # 履歴ファイル保存
-    with open(web_filepath, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    # 最新版のindex.htmlも更新
-    with open('web/index.html', 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    return web_filepath
-
-def generate_schedule_html(schedule_data):
-    """スケジュールデータをHTML形式に変換（曜日優先表示）"""
-    if not schedule_data:
-        return '<p>今週はスケジュールがありません。</p>'
-    
-    html = ""
-    weekday_jp = {
-        'Monday': '月', 'Tuesday': '火', 'Wednesday': '水', 
-        'Thursday': '木', 'Friday': '金', 'Saturday': '土', 'Sunday': '日'
+    # 株価データHTML生成
+    stock_html = ""
+    ticker_names = {
+        "N225": "日経平均株価",
+        "SPY": "S&P 500 ETF", 
+        "RCRUY": "リクルートHD (ADR)"
     }
     
-    for item in schedule_data:
-        start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
-        weekday = weekday_jp.get(start_time.strftime('%A'), start_time.strftime('%a'))
-        date_str = start_time.strftime('%-m/%-d')  # 6/24 形式
+    for ticker, data in stock_data.items():
+        name = ticker_names.get(ticker, ticker)
+        change_class = "positive" if data['change'] > 0 else "negative" if data['change'] < 0 else "neutral"
         
-        # 重要度に応じてステータスを設定
-        status_class = "important" if "株主総会" in item['subject'] else "upcoming"
-        status_icon = "fa-star" if "株主総会" in item['subject'] else "fa-circle"
-        
-        html += f'''
-                        <div class="schedule-item">
-                            <div class="schedule-date">
-                                <span class="date-weekday-large">{weekday}</span>
-                                <span class="date-small">{date_str}</span>
-                            </div>
-                            <div class="schedule-content">
-                                <h3>{item['subject']}</h3>
-                            </div>
-                            <div class="schedule-status {status_class}">
-                                <i class="fas {status_icon}"></i>
-                            </div>
-                        </div>'''
+        stock_html += f"""
+        <div class="stock-card">
+            <h3>{name}</h3>
+            <p class="stock-symbol">{ticker}</p>
+            <p class="stock-price">${data['current_price']:.2f}</p>
+            <span class="stock-change {change_class}">{data['change']:+.2f} ({data['change_percent']:+.2f}%)</span>
+        </div>
+        """
     
+    # HTML全体を生成
+    html_content = f"""
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>週次レポート - AI駆動分析</title>
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }}
+        .container {{ max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
+        h2 {{ color: #34495e; margin-top: 30px; }}
+        .metrics-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }}
+        .metric-card {{ background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; }}
+        .metric-value {{ font-size: 24px; font-weight: bold; color: #2c3e50; margin: 10px 0; }}
+        .change.positive {{ color: #27ae60; }}
+        .change.negative {{ color: #e74c3c; }}
+        .stock-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }}
+        .stock-card {{ background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center; }}
+        .news-item {{ background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #e74c3c; }}
+        .news-summary {{ color: #555; line-height: 1.6; margin: 10px 0; }}
+        .news-link {{ color: #3498db; text-decoration: none; font-weight: bold; }}
+        .news-link:hover {{ text-decoration: underline; }}
+        .score-badge {{ background: #f39c12; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px; }}
+        .summary-box {{ background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #27ae60; }}
+        .period-info {{ background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 10px 0; text-align: center; font-weight: bold; color: #1976d2; }}
+        .footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px; text-align: center; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 週次レポート - AI駆動分析</h1>
+        
+        <div class="period-info">
+            📅 分析対象期間: {period_description}
+        </div>
+        
+        <h2>💼 ビジネス実績</h2>
+        <div class="metrics-grid">
+            {sales_html}
+        </div>
+        
+        <h2>📈 株価情報</h2>
+        <div class="stock-grid">
+            {stock_html}
+        </div>
+        
+        <h2>📅 今週のスケジュール</h2>
+        {schedule_html}
+        
+        <h2>📰 AI業界ニュース</h2>
+        
+        <div class="summary-box">
+            <h3>📋 今週のサマリー</h3>
+            <p>{weekly_summary}</p>
+        </div>
+        
+        <h3>📄 詳細記事</h3>
+        {news_html}
+        
+        <div class="footer">
+            <p>🤖 生成日時: {generation_time} | AI駆動ニュース分析システム</p>
+        </div>
+    </div>
+</body>
+</html>
+    """
+    
+    return html_content
+
+def update_web_news_json(news_data):
+    """Web用のニュースJSONファイルを更新"""
+    web_news_data = []
+    
+    for news in news_data:
+        web_news_data.append({
+            "title": news.get('title', ''),
+            "description": news.get('summary_jp', '') or news.get('description', ''),
+            "url": news.get('url', ''),
+            "company": news.get('keyword', 'unknown'),
+            "publishedAt": news.get('published_at', ''),
+            "score": news.get('score', 0)
+        })
+    
+    # web/news-data.jsonに保存
+    web_dir = "web"
+    os.makedirs(web_dir, exist_ok=True)
+    
+    json_path = os.path.join(web_dir, "news-data.json")
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(web_news_data, f, ensure_ascii=False, indent=2)
+
+def generate_schedule_html(schedule_data):
+    """スケジュールをHTML形式に変換"""
+    if not schedule_data:
+        return "<p>今週の予定はありません。</p>"
+    
+    html = "<div class='schedule-list'>"
+    for event in schedule_data:
+        try:
+            start_time = datetime.fromisoformat(event['start'].replace('Z', '+00:00'))
+            formatted_date = start_time.strftime('%m月%d日 (%a)')
+            formatted_time = start_time.strftime('%H:%M')
+            
+            html += f"""
+            <div class="schedule-item" style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                <strong>{formatted_date} {formatted_time}</strong>: {event['subject']}
+            </div>
+            """
+        except Exception as e:
+            html += f"""
+            <div class="schedule-item" style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                {event['subject']}
+            </div>
+            """
+    
+    html += "</div>"
     return html
 
+def main():
+    """メイン実行関数"""
+    asyncio.run(generate_test_report())
+
 if __name__ == "__main__":
-    try:
-        report_path, web_path = generate_test_report()
-        
-        print("\n🎉 テストレポート生成成功！")
-        print(f"📁 Markdownレポート: {report_path}")
-        print(f"🌐 Webレポート: {web_path}")
-        print("\n📖 レポートを確認してください:")
-        print(f"   open {report_path}")
-        print(f"   open {web_path}")
-        print("\n🔄 次回実行時は最新データで更新されます")
-        
-    except Exception as e:
-        print(f"❌ エラーが発生しました: {e}")
-        import traceback
-        traceback.print_exc() 
+    main() 

@@ -1,0 +1,39 @@
+{
+  "generated_at": "2025-06-22T12:09:32.270032",
+  "total_items": 3,
+  "analysis_results": [
+    {
+      "title": "I tried Google’s new Search Live feature and ended up debating an AI about books",
+      "url": "https://www.techradar.com/computing/artificial-intelligence/i-tried-googles-new-search-live-feature-and-ended-up-debating-an-ai-about-books",
+      "published_at": "2025-06-21T01:30:00Z",
+      "company_id": "google_ai",
+      "source_type": "newsapi",
+      "importance_score": 5.15,
+      "japanese_summary": "Google AIは、新機能「Search Live」をリリース。AIとリアルタイムの音声対話が可能に。Geminiで駆動され、親しみやすく知識豊富な対話が可能。ユーザーは本について議論するなど、インタラクティブな体験を提供。",
+      "original_summary": "Google’s Search Live turns simple queries into voice chats, complete with philosophical tangents.",
+      "tags": []
+    },
+    {
+      "title": "storiesHow Lovable Empowered Grammy Nominated Music Producer and Filmmaker Mike Burns to Build an AI Filmmaking Studio PlatformGrammy-nominated filmmaker Mike Burns used Lovable—without any coding experience—to build MVP, an AI-powered filmmaking studio that's now reshaping how movies are made and opening Hollywood to a new wave of creators.Stephane & Mike•April 15, 2025",
+      "url": "https://lovable.dev/blog/mike-burns-ai-filmmaking-studio-platform",
+      "published_at": "2025-06-22T11:39:18.709413",
+      "company_id": "lovable",
+      "source_type": "web_scraping",
+      "importance_score": 5.15,
+      "japanese_summary": "2025年4月15日、グラミー賞ノミネートの映画監督マイク・バーンズが、Lovableを使用してコード経験なしでAI映画制作プラットフォームMVPを構築。映画制作を変革し、ハリウッドに新規クリエイターを開放。",
+      "original_summary": "",
+      "tags": []
+    },
+    {
+      "title": "BigWater Protocol Launches Blockchain-Based Platform for Global Climate Action",
+      "url": "https://www.globenewswire.com/news-release/2025/06/20/3102942/0/en/BigWater-Protocol-Launches-Blockchain-Based-Platform-for-Global-Climate-Action.html",
+      "published_at": "2025-06-20T20:41:00Z",
+      "company_id": "stability",
+      "source_type": "newsapi",
+      "importance_score": 5.15,
+      "japanese_summary": "2025年6月20日、アラブ首長国連邦ドバイで、stabilityがブロックチェーン技術を活用したグローバル気候行動プラットフォーム「BigWater Protocol」をリリース。気温上昇、森林減少、水資源不足などに応え、透明性と信頼性を確保し国際的な気候対策を推進する。",
+      "original_summary": "DUBAI, United Arab Emirates, June 20, 2025 (GLOBE NEWSWIRE) -- As the world confronts an escalating climate emergency marked by rising global temperatures, deforestation, water scarcity, and deteriorating air quality, the need for inclusive and scalable solut…",
+      "tags": []
+    }
+  ]
+}

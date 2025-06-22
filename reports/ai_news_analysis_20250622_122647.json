@@ -1,0 +1,76 @@
+{
+  "generated_at": "2025-06-22T12:26:47.534001",
+  "total_items": 5,
+  "analysis_results": [
+    {
+      "title": "Introducing OpenAI for Government",
+      "url": "https://openai.com/global-affairs/introducing-openai-for-government",
+      "published_at": "2025-06-16T00:00:00",
+      "summary": "We’re launching OpenAI for Government, a new initiative focused on bringing our most advanced AI tools to public servants across the United States. We're supporting the U.S. government's efforts in adopting best-in-class technology and deploying these tools in service of the public good.",
+      "company_id": "openai",
+      "source_type": "rss",
+      "source_url": "https://openai.com/blog/rss.xml",
+      "content": "June 16, 2025Global AffairsIntroducing OpenAI for GovernmentLoading…ShareToday we’re launching OpenAI for Government, a new initiative focused on bringing our most advanced AI tools to public servants across the United States. We're supporting the U.S. government's efforts in adopting best-in-class technology and deploying these tools in service of the public good. Our goal is to unlock AI solutions that enhance the capabilities of government workers, help them cut down on the red tape and paperwork, and let them do more of what they come to work each day to do: serve the American people.OpenAI for Government consolidates our existing efforts to provide our technology to the U.S. government—including previously announced customers and partnerships as well as ourChatGPT Gov⁠product—under one umbrella as we expand this work. Our establishedcollaborations with the U.S. National Labs⁠, the Air Force Research Laboratory, NASA, NIH, and the Treasury will all be brought under OpenAI for Gover",
+      "base_score": 8.0,
+      "ai_score": 5.5,
+      "summary_jp": "OpenAI政府向けサービス開始",
+      "score": 6.8
+    },
+    {
+      "title": "Claude Sonnet 4 is now available in Conversational AI",
+      "url": "https://elevenlabs.io/blog/claude-sonnet-4-is-now-available-in-conversational-ai",
+      "published_at": "2025-06-22T12:26:26.376115",
+      "summary": "",
+      "company_id": "elevenlabs",
+      "source_type": "web_scraping",
+      "source_url": "https://elevenlabs.io/blog",
+      "content": "",
+      "base_score": 7.0,
+      "ai_score": 5.5,
+      "summary_jp": "Claude Sonnet4リリース",
+      "score": 6.2
+    },
+    {
+      "title": "KPN and ElevenLabs announce strategic partnership to bring voice AI to the Netherlands",
+      "url": "https://elevenlabs.io/blog/KPN",
+      "published_at": "2025-06-22T12:26:26.376012",
+      "summary": "",
+      "company_id": "elevenlabs",
+      "source_type": "web_scraping",
+      "source_url": "https://elevenlabs.io/blog",
+      "content": "",
+      "base_score": 8.0,
+      "ai_score": 4.0,
+      "summary_jp": "KPNとElevenLabs提携",
+      "score": 6.0
+    },
+    {
+      "title": "OpenAI o3 and o4-mini",
+      "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+      "published_at": "2025-06-22T12:26:15.548847",
+      "summary": "",
+      "company_id": "openai",
+      "source_type": "web_scraping",
+      "source_url": "https://openai.com/blog/",
+      "content": "",
+      "base_score": 8.0,
+      "ai_score": 3.5,
+      "summary_jp": "OpenAI新モデル発表",
+      "score": 5.8
+    },
+    {
+      "title": "Here's how ElevenLabs scaled with Stripe",
+      "url": "https://elevenlabs.io/blog/heres-how-elevenlabs-scaled-with-stripe",
+      "published_at": "2025-06-22T12:26:26.376311",
+      "summary": "",
+      "company_id": "elevenlabs",
+      "source_type": "web_scraping",
+      "source_url": "https://elevenlabs.io/blog",
+      "content": "",
+      "base_score": 6.0,
+      "ai_score": 5.5,
+      "summary_jp": "ElevenLabsとStripeの統合",
+      "score": 5.8
+    }
+  ]
+}

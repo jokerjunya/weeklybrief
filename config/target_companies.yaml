@@ -1,0 +1,77 @@
+# AI企業の情報源マッピング（無料版）
+# 各企業の公式RSS、ブログ、プレスリリースページ
+
+companies:
+  openai:
+    name: "OpenAI"
+    blog_rss: "https://openai.com/blog/rss.xml"
+    blog_url: "https://openai.com/blog/"
+    news_url: "https://openai.com/news/"
+    priority: 10
+    keywords: ["GPT", "ChatGPT", "API", "DALL-E", "Sora"]
+    
+  google_ai:
+    name: "Google AI"
+    blog_url: "https://blog.google/technology/ai/"
+    deepmind_url: "https://deepmind.google/discover/blog/"
+    priority: 10
+    keywords: ["Gemini", "Bard", "LaMDA", "PaLM", "DeepMind"]
+    
+  anthropic:
+    name: "Anthropic"
+    blog_url: "https://www.anthropic.com/news"
+    research_url: "https://www.anthropic.com/research"
+    priority: 9
+    keywords: ["Claude", "Constitutional AI", "AI Safety"]
+    
+  elevenlabs:
+    name: "ElevenLabs"
+    blog_url: "https://elevenlabs.io/blog"
+    priority: 7
+    keywords: ["voice AI", "text-to-speech", "voice cloning"]
+    
+  perplexity:
+    name: "Perplexity"
+    website: "https://www.perplexity.ai/"
+    priority: 8
+    keywords: ["AI search", "answer engine", "research", "Perplexity"]
+    
+  genspark:
+    name: "Genspark"
+    website: "https://www.genspark.ai/"
+    priority: 6
+    keywords: ["AI agent", "automation"]
+    
+  lovable:
+    name: "Lovable"
+    website: "https://lovable.dev/"
+    blog_url: "https://lovable.dev/blog"
+    priority: 6
+    keywords: ["AI development", "code generation"]
+
+# 追加監視対象（重要なAI企業）
+additional_targets:
+  mistral:
+    name: "Mistral AI"
+    blog_url: "https://mistral.ai/news/"
+    priority: 8
+    keywords: ["Mistral", "open source LLM"]
+    
+  cohere:
+    name: "Cohere"
+    blog_url: "https://cohere.com/blog"
+    priority: 7
+    keywords: ["enterprise AI", "language models"]
+    
+  stability:
+    name: "Stability AI"
+    blog_url: "https://stability.ai/news"
+    priority: 7
+    keywords: ["Stable Diffusion", "generative AI"]
+
+# スクレイピング設定
+scraping_config:
+  delay_seconds: 2  # リクエスト間隔
+  timeout_seconds: 30
+  max_retries: 3
+  user_agent: "WeeklyBrief-NewsCollector/1.0 (Research Purpose)" 

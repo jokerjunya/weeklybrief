@@ -1,31 +1,42 @@
-{
-  "summary": "テック企業、新製品発表",
-  "articles": [
-    {
-      "category": "openai",
-      "title": "BBC threatens Perplexity with legal action over content scraping",
-      "summary": "テック企業、業界動向",
-      "url": "https://www.neowin.net/news/bbc-threatens-perplexity-with-legal-action-over-content-scraping/",
-      "time": "06/20 06:40",
-      "source": "OpenAI"
-    },
-    {
-      "category": "openai",
-      "title": "Microsoft and OpenAI Forged a Close Bond. Why It’s Now Too Big to Last",
-      "summary": "OpenAI、業界動向",
-      "url": "https://biztoc.com/x/e19ad63136fb8f66",
-      "time": "06/20 06:38",
-      "source": "OpenAI"
-    },
-    {
-      "category": "openai",
-      "title": "CNBC Daily Open: Intensifying Israel-Iran conflict puts investors on shaky ground",
-      "summary": "テック企業、新製品発表",
-      "url": "https://www.cnbc.com/2025/06/20/cnbc-daily-open-israel-iran-conflict-puts-investors-on-shaky-ground.html",
-      "time": "06/20 06:30",
-      "source": "OpenAI"
-    }
-  ],
-  "total_articles": 3,
-  "generated_at": "2025-06-21 16:15:00"
-}
+[
+  {
+    "title": "Introducing OpenAI for Government",
+    "description": "OpenAI政府向けサービス開始",
+    "url": "https://openai.com/global-affairs/introducing-openai-for-government",
+    "company": "openai",
+    "publishedAt": "2025-06-16T00:00:00",
+    "score": 6.8
+  },
+  {
+    "title": "NorthAn integrated AI platform that empowers modern workers to do more",
+    "description": "オールインワンAIプラットフォーム",
+    "url": "https://cohere.com/north",
+    "company": "cohere",
+    "publishedAt": "2025-06-22T13:31:42.392969",
+    "score": 5.2
+  },
+  {
+    "title": "Eleven v3 Audio Tags: Precision delivery control for AI speech",
+    "description": "AI音声タグ革新",
+    "url": "https://elevenlabs.io/blog/eleven-v3-audio-tags-precision-delivery-control-for-ai-speech",
+    "company": "elevenlabs",
+    "publishedAt": "2025-06-16T12:00:00+00:00",
+    "score": 5.0
+  },
+  {
+    "title": "Dubbing made simpler, sharper, and faster at PERSO.ai",
+    "description": "AIダブリング革新",
+    "url": "https://elevenlabs.io/blog/persoai",
+    "company": "elevenlabs",
+    "publishedAt": "2025-06-19T12:00:00+00:00",
+    "score": 4.5
+  },
+  {
+    "title": "Preparing for future AI risks in biology",
+    "description": "AIリスク対策の生物学",
+    "url": "https://openai.com/index/preparing-for-future-ai-capabilities-in-biology",
+    "company": "openai",
+    "publishedAt": "2025-06-18T10:00:00",
+    "score": 4.2
+  }
+]

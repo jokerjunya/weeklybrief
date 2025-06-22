@@ -66,13 +66,21 @@ class WeeklyReportApp {
                 
                 console.log('✅ ニュースデータ読み込み完了:', this.newsData.length + '件');
                 this.updateNewsStats();
+                this.updatePeriodInfo();
+                this.updateWeeklySummary();
+                this.generateCategoryButtons(); // 動的にカテゴリボタンを生成
+                this.renderNews(); // ニュースを表示
             } else {
                 throw new Error('Failed to load news data');
             }
         } catch (error) {
             console.error('ニュースデータの読み込みに失敗しました:', error);
-            document.getElementById('news-container').innerHTML = 
-                '<p class="error">ニュースデータの読み込みに失敗しました。</p>';
+            const container = document.getElementById('newsGrid');
+            if (container) {
+                container.innerHTML = '<p class="error">ニュースデータの読み込みに失敗しました。</p>';
+            }
+            // エラー時のフォールバック表示
+            this.updateWeeklySummary('今週のニュースサマリーを読み込めませんでした。');
         }
     }
 
@@ -215,8 +223,13 @@ class WeeklyReportApp {
     }
 
     renderNews() {
-        const container = document.getElementById('news-container');
+        const container = document.getElementById('newsGrid');
         const filteredNews = this.getFilteredNews();
+        
+        if (!container) {
+            console.error('News container not found');
+            return;
+        }
         
         if (filteredNews.length === 0) {
             container.innerHTML = `
@@ -229,36 +242,28 @@ class WeeklyReportApp {
         }
 
         container.innerHTML = filteredNews.map(article => `
-            <article class="news-item" data-category="${article.category}">
-                <div class="news-item-header">
-                    ${this.renderCompanyLogo(article)}
-                    <div class="news-item-meta">
-                        <div class="news-item-company">${article.companyName || '企業情報なし'}</div>
-                        <div class="news-item-date">${this.formatDate(article.published_at)}</div>
-                    </div>
+            <div class="news-card" data-category="${article.companyId || 'other'}">
+                <div class="news-header">
+                    <span class="news-category ${article.companyId || 'other'}">${article.companyName || 'その他'}</span>
+                    <span class="news-time">最近</span>
+                    ${article.score ? `<span class="news-score">重要度: ${article.score}</span>` : ''}
                 </div>
-                <h3 class="news-item-title">
-                    <a href="${article.url}" target="_blank" rel="noopener noreferrer">
-                        ${article.title}
-                    </a>
+                <h3 class="news-title">
+                    ${article.description || article.title}
                 </h3>
-                ${article.summary_jp ? `
-                    <div class="news-item-summary">
-                        <span class="summary-label">🇯🇵 要約:</span>
-                        <span class="summary-text">${article.summary_jp}</span>
-                    </div>
+                ${article.summary ? `
+                    <p class="news-excerpt">${this.truncateText(article.summary, 150)}</p>
                 ` : ''}
-                ${article.description ? `
-                    <p class="news-item-description">${this.truncateText(article.description, 150)}</p>
-                ` : ''}
-                <div class="news-item-footer">
-                    <span class="news-item-category" data-category="${article.category}">
-                        ${this.getCategoryIcon(article.category)} ${this.getCategoryName(article.category)}
-                    </span>
-                    <span class="news-item-source">${article.keyword || 'ニュース'}</span>
+                <div class="news-footer">
+                    <a href="${article.url}" target="_blank" class="news-link">
+                        <span>詳細を読む</span>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
                 </div>
-            </article>
+            </div>
         `).join('');
+        
+        console.log('✅ ニュース表示完了:', filteredNews.length + '件');
     }
 
     renderCompanyLogo(article) {
@@ -363,24 +368,24 @@ class WeeklyReportApp {
                     e.preventDefault();
                     this.exportReport();
                     break;
-                case '1':
-                    e.preventDefault();
-                    this.filterNewsByKey('all');
-                    break;
-                case '2':
-                    e.preventDefault();
-                    this.filterNewsByKey('openai');
-                    break;
-                case '3':
-                    e.preventDefault();
-                    this.filterNewsByKey('gemini');
-                    break;
-                case '4':
-                    e.preventDefault();
-                    this.filterNewsByKey('other');
+                default:
+                    // 数字キーでカテゴリフィルタリング
+                    const keyNumber = parseInt(e.key);
+                    if (keyNumber >= 1 && keyNumber <= 9) {
+                        e.preventDefault();
+                        this.filterNewsByKeyNumber(keyNumber);
+                    }
                     break;
             }
         });
+    }
+
+    filterNewsByKeyNumber(keyNumber) {
+        const buttons = document.querySelectorAll('.category-btn');
+        if (buttons[keyNumber - 1]) {
+            const category = buttons[keyNumber - 1].dataset.category;
+            this.filterNews(category, buttons);
+        }
     }
 
     filterNewsByKey(category) {
@@ -604,6 +609,133 @@ class WeeklyReportApp {
         });
 
         console.log('📊 企業別ニュース統計:', companyStats);
+    }
+
+    updatePeriodInfo() {
+        /*
+        分析対象期間を更新
+        */
+        const periodElement = document.getElementById('periodInfo');
+        if (periodElement) {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            const formatDate = (date) => {
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            };
+            
+            const periodText = `分析対象期間: ${formatDate(weekAgo)}〜${formatDate(today)}（過去1週間）`;
+            periodElement.innerHTML = `<p>${periodText}</p>`;
+        }
+    }
+
+    updateWeeklySummary(customSummary = null) {
+        /*
+        週次サマリーを更新
+        */
+        const summaryElement = document.getElementById('weeklySummary');
+        if (!summaryElement) return;
+        
+        if (customSummary) {
+            summaryElement.textContent = customSummary;
+            return;
+        }
+        
+        if (!this.newsData || this.newsData.length === 0) {
+            summaryElement.textContent = '今週は重要なニュースは確認されませんでした。';
+            return;
+        }
+        
+        // 企業別統計を生成
+        const companyStats = {};
+        const topNews = this.newsData.slice(0, 5); // 上位5件
+        
+        topNews.forEach(news => {
+            const company = news.companyName || 'その他';
+            companyStats[company] = (companyStats[company] || 0) + 1;
+        });
+        
+        const mainCompanies = Object.keys(companyStats)
+            .sort((a, b) => companyStats[b] - companyStats[a])
+            .slice(0, 3);
+        
+        // 平均重要度計算
+        const avgScore = topNews.reduce((sum, news) => sum + (news.score || 5), 0) / topNews.length;
+        
+        // サマリー生成
+        let summary = '';
+        if (mainCompanies.length > 0) {
+            summary = `今週は${mainCompanies.join('、')}を中心としたAI・テクノロジー関連の発表が相次ぎました。`;
+            
+            if (topNews.length > 0) {
+                const topTitle = topNews[0].title;
+                const shortTitle = topTitle.length > 50 ? topTitle.substring(0, 47) + '...' : topTitle;
+                summary += `特に「${shortTitle}」などの動向が注目されています。`;
+            }
+            
+            if (avgScore >= 6.5) {
+                summary += 'AI技術の実用化と企業間の戦略的提携が加速しており、業界全体の競争が激化しています。';
+            } else if (avgScore >= 5.5) {
+                summary += '新技術の発表や企業提携など、着実な進展が見られます。';
+            } else {
+                summary += '引き続きAI・テクノロジー分野の動向に注目していきます。';
+            }
+        } else {
+            summary = '今週はAI・テクノロジー関連の重要なニュースは確認されませんでした。引き続き業界動向を監視しています。';
+        }
+        
+        summaryElement.textContent = summary;
+    }
+
+    generateCategoryButtons() {
+        /*
+        ニュースデータから動的にカテゴリボタンを生成
+        */
+        const categoriesContainer = document.querySelector('.news-categories');
+        if (!categoriesContainer) return;
+
+        // ニュースデータから企業IDを収集
+        const companies = new Set();
+        this.newsData.forEach(article => {
+            if (article.companyId && article.companyId !== 'unknown') {
+                companies.add(article.companyId);
+            }
+        });
+
+        // 企業名マッピング
+        const companyNames = {
+            'openai': 'OpenAI',
+            'google_ai': 'Google AI',
+            'anthropic': 'Anthropic',
+            'elevenlabs': 'ElevenLabs',
+            'perplexity': 'Perplexity',
+            'genspark': 'Genspark',
+            'lovable': 'Lovable',
+            'mistral': 'Mistral AI',
+            'cohere': 'Cohere',
+            'stability': 'Stability AI',
+            'other': 'その他'
+        };
+
+        // ボタンHTML生成
+        let buttonsHTML = '<button class="category-btn active" data-category="all" title="キーボード: 1">全て</button>';
+        
+        // 企業ボタンを追加（アルファベット順）
+        const sortedCompanies = Array.from(companies).sort();
+        sortedCompanies.forEach((companyId, index) => {
+            const displayName = companyNames[companyId] || companyId;
+            const keyNumber = index + 2; // 2から開始（1は「全て」）
+            buttonsHTML += `<button class="category-btn" data-category="${companyId}" title="キーボード: ${keyNumber}">${displayName}</button>`;
+        });
+
+        // その他ボタンを追加
+        if (this.newsData.some(article => !article.companyId || article.companyId === 'unknown')) {
+            const keyNumber = sortedCompanies.length + 2;
+            buttonsHTML += `<button class="category-btn" data-category="other" title="キーボード: ${keyNumber}">その他</button>`;
+        }
+
+        categoriesContainer.innerHTML = buttonsHTML;
+        console.log('✅ カテゴリボタン生成完了:', sortedCompanies.length + 1 + '個');
     }
 }
 

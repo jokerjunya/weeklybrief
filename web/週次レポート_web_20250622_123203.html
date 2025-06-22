@@ -205,28 +205,65 @@
                 <p class="section-subtitle">AI・テクノロジー関連の最新情報</p>
             </div>
             
-            <!-- Period Information -->
-            <div class="period-info" id="periodInfo">
-                <p>分析対象期間: 過去1週間</p>
-            </div>
-            
             <!-- News Summary -->
             <div class="news-summary">
                 <h3>今週のサマリー</h3>
-                <p id="weeklySummary">ニュースサマリーを読み込み中...</p>
+                <p>今週はGoogleによる新技術・サービス発表が相次ぎ、AI機能の実用化が加速。主な動向としてAI関連スタートアップ、大型資金調達など、How to reduce the environmentaといった展開も見られる。</p>
             </div>
 
             <!-- News Categories -->
             <div class="news-categories">
-                <!-- カテゴリボタンはJavaScriptで動的に生成されます -->
+                <button class="category-btn active" data-category="all" title="キーボード: 1">全て</button>
+                <button class="category-btn" data-category="openai" title="キーボード: 2">OpenAI</button>
+                <button class="category-btn" data-category="gemini" title="キーボード: 3">Gemini</button>
+                <button class="category-btn" data-category="other" title="キーボード: 4">その他</button>
             </div>
 
             <!-- News Grid -->
             <div class="news-grid" id="newsGrid">
-                <!-- ニュースはJavaScriptで動的に生成されます -->
-                <div class="loading-placeholder">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>ニュースを読み込み中...</p>
+                <div class="news-card" data-category="openai">
+                    <div class="news-header">
+                        <span class="news-category openai">OpenAI</span>
+                        <span class="news-time">2時間前</span>
+                    </div>
+                    <h3 class="news-title">OpenAI、新しいGPT-4モデルを発表</h3>
+                    <p class="news-excerpt">より高精度で効率的な言語処理能力を持つ新モデルが企業向けに提供開始...</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">
+                            <span>記事を読む</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="news-card" data-category="gemini">
+                    <div class="news-header">
+                        <span class="news-category gemini">Gemini</span>
+                        <span class="news-time">4時間前</span>
+                    </div>
+                    <h3 class="news-title">Google Gemini、マルチモーダル機能を強化</h3>
+                    <p class="news-excerpt">テキスト、画像、音声を統合した新機能により、より自然な対話が可能に...</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">
+                            <span>記事を読む</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="news-card" data-category="other">
+                    <div class="news-header">
+                        <span class="news-category other">Tech</span>
+                        <span class="news-time">6時間前</span>
+                    </div>
+                    <h3 class="news-title">企業のAI導入率が前年比150%増加</h3>
+                    <p class="news-excerpt">最新の調査により、日本企業のAI技術導入が急速に進んでいることが判明...</p>
+                    <div class="news-footer">
+                        <a href="#" class="news-link">
+                            <span>記事を読む</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>

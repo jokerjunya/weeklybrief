@@ -1,0 +1,97 @@
+{
+  "generated_at": "2025-06-22T13:31:58.589701",
+  "period_info": {
+    "start_date": "2025年06月15日",
+    "end_date": "2025年06月22日",
+    "period_description": "06/15〜06/22（過去1週間）"
+  },
+  "weekly_summary": "今週のAI・テクノロジーニュースは、政府・ビジネス向けのサービス拡大と、産業分野での実用化が目立つ。OpenAIは政府向けサービスを開始し、セキュリティ強化で公的分野への浸透を進める。NorthAnはオールインワンAIプラットフォームで作業効率向上を推進。Elevenlabsは音声タグ技術でカスタマイズ性を高め、PERSO.aiはダブリングの高速化でメディア業界に変革をもたらす。一方で、生物学分野でのAIリスク対策も注目される。企業は技術革新と倫理的課題の両輪で市場を席巻し、新たなビジネス機会と規制のバランスが鍵となる。",
+  "total_items": 5,
+  "top_items": 5,
+  "statistics": {
+    "selection_rate": "100.0%",
+    "average_score": 5.14,
+    "top_average_score": 5.14,
+    "company_distribution": {
+      "openai": 2,
+      "elevenlabs": 2,
+      "cohere": 1
+    },
+    "source_distribution": {
+      "web_scraping": 3,
+      "rss": 2
+    }
+  },
+  "analysis_results": [
+    {
+      "title": "Introducing OpenAI for Government",
+      "url": "https://openai.com/global-affairs/introducing-openai-for-government",
+      "published_at": "2025-06-16T00:00:00",
+      "summary": "We’re launching OpenAI for Government, a new initiative focused on bringing our most advanced AI tools to public servants across the United States. We're supporting the U.S. government's efforts in adopting best-in-class technology and deploying these tools in service of the public good.",
+      "company_id": "openai",
+      "source_type": "rss",
+      "source_url": "https://openai.com/blog/rss.xml",
+      "content": "",
+      "base_score": 8.0,
+      "ai_score": 5.5,
+      "summary_jp": "OpenAI政府向けサービス開始",
+      "score": 6.8
+    },
+    {
+      "title": "NorthAn integrated AI platform that empowers modern workers to do more",
+      "url": "https://cohere.com/north",
+      "published_at": "2025-06-22T13:31:42.392969",
+      "summary": "",
+      "company_id": "cohere",
+      "source_type": "web_scraping",
+      "source_url": "https://cohere.com/blog",
+      "content": "",
+      "base_score": 5.0,
+      "ai_score": 5.5,
+      "summary_jp": "オールインワンAIプラットフォーム",
+      "score": 5.2
+    },
+    {
+      "title": "Eleven v3 Audio Tags: Precision delivery control for AI speech",
+      "url": "https://elevenlabs.io/blog/eleven-v3-audio-tags-precision-delivery-control-for-ai-speech",
+      "published_at": "2025-06-16T12:00:00+00:00",
+      "summary": "",
+      "company_id": "elevenlabs",
+      "source_type": "web_scraping",
+      "source_url": "https://elevenlabs.io/blog",
+      "content": "",
+      "base_score": 5.0,
+      "ai_score": 5.0,
+      "summary_jp": "AI音声タグ革新",
+      "score": 5.0
+    },
+    {
+      "title": "Dubbing made simpler, sharper, and faster at PERSO.ai",
+      "url": "https://elevenlabs.io/blog/persoai",
+      "published_at": "2025-06-19T12:00:00+00:00",
+      "summary": "",
+      "company_id": "elevenlabs",
+      "source_type": "web_scraping",
+      "source_url": "https://elevenlabs.io/blog",
+      "content": "",
+      "base_score": 5.0,
+      "ai_score": 4.0,
+      "summary_jp": "AIダブリング革新",
+      "score": 4.5
+    },
+    {
+      "title": "Preparing for future AI risks in biology",
+      "url": "https://openai.com/index/preparing-for-future-ai-capabilities-in-biology",
+      "published_at": "2025-06-18T10:00:00",
+      "summary": "Advanced AI can transform biology and medicine—but also raises biosecurity risks. We’re proactively assessing capabilities and implementing safeguards to prevent misuse.",
+      "company_id": "openai",
+      "source_type": "rss",
+      "source_url": "https://openai.com/blog/rss.xml",
+      "content": "",
+      "base_score": 5.0,
+      "ai_score": 3.5,
+      "summary_jp": "AIリスク対策の生物学",
+      "score": 4.2
+    }
+  ]
+}
