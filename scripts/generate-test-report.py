@@ -166,7 +166,7 @@ async def generate_test_report():
 
 ---
 
-## 📰 業界ニュース
+## 📰 業界ニュース（まだ試験中）
 
 ### 📊 分析対象期間
 **{period_description}**
@@ -236,7 +236,7 @@ async def generate_test_report():
     print(f"📊 Web JSON: web/news-data.json")
 
 def generate_news_markdown(news_data):
-    """ニュースデータをMarkdown形式に変換"""
+    """ニュースデータをMarkdown形式に変換（詳細説明付き）"""
     if not news_data:
         return "今週は重要なニュースはありませんでした。"
     
@@ -249,14 +249,34 @@ def generate_news_markdown(news_data):
         
         markdown += f"#### {i}. {news['title']}{score_text}\n\n"
         
-        # 要約を表示（日本語要約優先）
+        # 詳細説明文を追加（要約の拡張版）
         summary = news.get('summary_jp', '') or news.get('description', '')
         if summary:
-            markdown += f"**要約**: {summary}\n\n"
+            # 要約を適切な長さに調整
+            if len(summary) > 200:
+                # 文の切れ目で切る
+                sentences = summary.split('。')
+                detailed_summary = ""
+                for sentence in sentences:
+                    if len(detailed_summary + sentence + '。') <= 200:
+                        detailed_summary += sentence + '。'
+                    else:
+                        break
+                if not detailed_summary:
+                    detailed_summary = summary[:197] + "..."
+            else:
+                detailed_summary = summary
+            
+            markdown += f"{detailed_summary}\n\n"
+        
+        # 企業情報追加（もしあれば）
+        if news.get('company_id'):
+            company_name = news.get('company_name', news['company_id'])
+            markdown += f"**関連企業**: {company_name}\n\n"
         
         # URL追加
         if news.get('url'):
-            markdown += f"**リンク**: [記事を読む]({news['url']})\n\n"
+            markdown += f"**詳細**: [記事を読む]({news['url']})\n\n"
         
         # 公開日追加（もしあれば）
         if news.get('published_at'):
@@ -295,23 +315,41 @@ def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_s
     # スケジュールHTML生成
     schedule_html = generate_schedule_html(schedule_data)
     
-    # ニュースHTML生成（重要度スコア付き）
+    # ニュースHTML生成（重要度スコア付き・詳細説明対応）
     news_html = ""
     for i, news in enumerate(news_data, 1):
         score_badge = ""
         if news.get('score'):
             score_badge = f'<span class="score-badge">重要度: {news["score"]:.1f}</span>'
         
-        # 要約を表示（80-120文字程度に調整）
+        # 詳細説明を表示（150-200文字程度に調整）
         summary = news.get('summary_jp', '') or news.get('description', '')
-        if len(summary) > 120:
-            summary = summary[:117] + "..."
+        
+        # 企業情報を追加
+        company_info = ""
+        if news.get('company_id'):
+            company_name = news.get('company_name', news['company_id'])
+            company_info = f'<span class="company-tag">{company_name}</span>'
+        
+        # 公開日情報
+        date_info = ""
+        if news.get('published_at'):
+            try:
+                pub_date = datetime.fromisoformat(news['published_at'].replace('Z', '+00:00'))
+                formatted_date = pub_date.strftime('%Y年%m月%d日')
+                date_info = f'<span class="date-info">{formatted_date}</span>'
+            except:
+                pass
         
         news_html += f"""
         <div class="news-item">
             <h4>{news['title']} {score_badge}</h4>
+            <div class="news-meta">
+                {company_info}
+                {date_info}
+            </div>
             <p class="news-summary">{summary}</p>
-            <a href="{news.get('url', '#')}" target="_blank" class="news-link">記事を読む →</a>
+            <a href="{news.get('url', '#')}" target="_blank" class="news-link">詳細を読む →</a>
         </div>
         """
     
@@ -380,7 +418,10 @@ def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_s
         .stock-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }}
         .stock-card {{ background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center; }}
         .news-item {{ background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #e74c3c; }}
-        .news-summary {{ color: #555; line-height: 1.6; margin: 10px 0; }}
+        .news-meta {{ margin: 8px 0; }}
+        .company-tag {{ background: #3498db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-right: 10px; }}
+        .date-info {{ background: #95a5a6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }}
+        .news-summary {{ color: #555; line-height: 1.6; margin: 15px 0; font-size: 14px; }}
         .news-link {{ color: #3498db; text-decoration: none; font-weight: bold; }}
         .news-link:hover {{ text-decoration: underline; }}
         .score-badge {{ background: #f39c12; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px; }}
@@ -410,7 +451,7 @@ def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_s
         <h2>📅 今週のスケジュール</h2>
         {schedule_html}
         
-        <h2>📰 AI業界ニュース</h2>
+        <h2>📰 AI業界ニュース（まだ試験中）</h2>
         
         <div class="summary-box">
             <h3>📋 今週のサマリー</h3>
