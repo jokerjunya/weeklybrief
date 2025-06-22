@@ -430,6 +430,21 @@ body {
   margin-top: var(--space-xs);
 }
 
+/* 新しい曜日優先表示スタイル */
+.date-weekday-large {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.date-small {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
 .schedule-content {
   flex: 1;
 }

@@ -61,7 +61,7 @@ def generate_test_report():
     # 5. スケジュールデータ（6月実スケジュール）
     sample_schedule = [
         {"subject": "JP HR Steering Committee", "start": "2025-06-24T09:00:00Z"},
-        {"subject": "株主総会オンサイト", "start": "2025-06-25T10:00:00Z"},
+        {"subject": "株主総会オンサイト", "start": "2025-06-26T10:00:00Z"},
         {"subject": "Bi-weekly SLT Meeting", "start": "2025-06-27T14:00:00Z"}
     ]
     
@@ -95,8 +95,8 @@ def generate_test_report():
         # メトリックタイプに応じて値をフォーマット
         if service.get('metric_type') == '内定数':
             current_display = f"{service['current_value']:,}件"
-        else:  # 売上
-            current_display = f"¥{service['current_value']:,}"
+        else:  # 売上 - 億円表示を使用
+            current_display = processor.format_japanese_currency(service['current_value'])
         
         report_content += f"""
 | {service['name']} | {service['metric_type']} | {current_display} | {yoy_icon} {service['yoy_change']:+.1f}% | {weekly_icon} {service['weekly_change']:+.1f}% |"""
@@ -170,6 +170,11 @@ def generate_test_report():
     
     print(f"📄 レポート生成完了: {filepath}")
     
+    # 7. Web HTML生成
+    print("🌐 Web HTML生成中...")
+    web_filepath = generate_web_html(sales_data, valid_stocks, sample_schedule, news_data, weekly_summary, generation_time)
+    print(f"🌐 Web HTML生成完了: {web_filepath}")
+    
     # 統計情報表示
     print("\n📊 生成レポート統計:")
     print(f"   ファイルサイズ: {len(report_content):,} 文字")
@@ -178,7 +183,7 @@ def generate_test_report():
     print(f"   ニュース: {len(news_data)} 記事")
     print(f"   スケジュール: {len(sample_schedule)} 予定")
     
-    return filepath
+    return filepath, web_filepath
 
 def generate_news_markdown(news_data):
     """ニュースデータをMarkdown形式に変換"""
@@ -233,14 +238,89 @@ def generate_schedule_markdown(schedule_data):
     
     return markdown
 
+def generate_web_html(sales_data, stock_data, schedule_data, news_data, weekly_summary, generation_time):
+    """Web HTML ファイルを生成（履歴管理対応）"""
+    
+    # 現在のindex.htmlをベースとして読み込み
+    with open('web/index.html', 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    
+    # 日付を更新
+    today = datetime.now().strftime("%Y年%m月%d日")
+    html_content = html_content.replace('2025年06月22日', today)
+    
+    # スケジュール部分を更新（曜日優先表示に変更）
+    schedule_html = generate_schedule_html(schedule_data)
+    
+    # スケジュール部分を置換
+    import re
+    schedule_pattern = r'(<div class="schedule-list">)(.*?)(</div>\s*</section>)'
+    html_content = re.sub(schedule_pattern, f'\\1{schedule_html}\\3', html_content, flags=re.DOTALL)
+    
+    # 履歴ファイル生成
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    web_filename = f"週次レポート_web_{timestamp}.html"
+    web_filepath = os.path.join("web", web_filename)
+    
+    # webディレクトリ作成
+    os.makedirs("web", exist_ok=True)
+    
+    # 履歴ファイル保存
+    with open(web_filepath, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    
+    # 最新版のindex.htmlも更新
+    with open('web/index.html', 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    
+    return web_filepath
+
+def generate_schedule_html(schedule_data):
+    """スケジュールデータをHTML形式に変換（曜日優先表示）"""
+    if not schedule_data:
+        return '<p>今週はスケジュールがありません。</p>'
+    
+    html = ""
+    weekday_jp = {
+        'Monday': '月', 'Tuesday': '火', 'Wednesday': '水', 
+        'Thursday': '木', 'Friday': '金', 'Saturday': '土', 'Sunday': '日'
+    }
+    
+    for item in schedule_data:
+        start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
+        weekday = weekday_jp.get(start_time.strftime('%A'), start_time.strftime('%a'))
+        date_str = start_time.strftime('%-m/%-d')  # 6/24 形式
+        
+        # 重要度に応じてステータスを設定
+        status_class = "important" if "株主総会" in item['subject'] else "upcoming"
+        status_icon = "fa-star" if "株主総会" in item['subject'] else "fa-circle"
+        
+        html += f'''
+                        <div class="schedule-item">
+                            <div class="schedule-date">
+                                <span class="date-weekday-large">{weekday}</span>
+                                <span class="date-small">{date_str}</span>
+                            </div>
+                            <div class="schedule-content">
+                                <h3>{item['subject']}</h3>
+                            </div>
+                            <div class="schedule-status {status_class}">
+                                <i class="fas {status_icon}"></i>
+                            </div>
+                        </div>'''
+    
+    return html
+
 if __name__ == "__main__":
     try:
-        report_path = generate_test_report()
+        report_path, web_path = generate_test_report()
         
         print("\n🎉 テストレポート生成成功！")
-        print(f"📁 保存場所: {report_path}")
+        print(f"📁 Markdownレポート: {report_path}")
+        print(f"🌐 Webレポート: {web_path}")
         print("\n📖 レポートを確認してください:")
         print(f"   open {report_path}")
+        print(f"   open {web_path}")
         print("\n🔄 次回実行時は最新データで更新されます")
         
     except Exception as e:

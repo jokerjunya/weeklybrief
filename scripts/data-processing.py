@@ -490,6 +490,31 @@ class WeeklyReportProcessor:
             "sales_table": sales_table_html,
             "stock_table": stock_html
         }
+    
+    def format_japanese_currency(self, amount: int) -> str:
+        """
+        日本円を日本式表記（億円、万円）でフォーマット
+        
+        Args:
+            amount (int): 金額（円）
+        
+        Returns:
+            str: フォーマットされた金額文字列
+        """
+        if amount >= 100000000:  # 1億円以上
+            oku = amount / 100000000
+            if oku >= 10:
+                return f"{oku:.0f}億円"
+            else:
+                return f"{oku:.1f}億円"
+        elif amount >= 10000:  # 1万円以上
+            man = amount / 10000
+            if man >= 100:
+                return f"{man:.0f}万円"
+            else:
+                return f"{man:.1f}万円"
+        else:
+            return f"{amount:,}円"
 
 if __name__ == "__main__":
     # テスト実行用
