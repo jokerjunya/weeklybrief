@@ -14,6 +14,8 @@ from typing import Dict, List, Any, Optional
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import re
+import os
+import sys
 
 class CompanyNewsCollector:
     def __init__(self, config_path="config/target_companies.yaml", newsapi_key=None):
@@ -24,15 +26,14 @@ class CompanyNewsCollector:
             config_path: 企業設定ファイルのパス
             newsapi_key: NewsAPIキー
         """
-        self.config = self.load_company_config(config_path)
-        self.newsapi_key = newsapi_key or "5d88b85486d641faba9a410aca9c138b"
+        self.companies = self.load_company_config(config_path)
+        self.newsapi_key = newsapi_key or os.getenv('NEWSAPI_KEY') or "5d88b85486d641faba9a410aca9c138b"
         
-        # スクレイピング設定
-        self.scraping_config = self.config.get('scraping_config', {})
-        self.delay_seconds = self.scraping_config.get('delay_seconds', 2)
-        self.timeout_seconds = self.scraping_config.get('timeout_seconds', 30)
-        self.max_retries = self.scraping_config.get('max_retries', 3)
-        self.user_agent = self.scraping_config.get('user_agent', 'WeeklyBrief-NewsCollector/1.0')
+        # スクレイピング設定（デフォルト値）
+        self.delay_seconds = 2
+        self.timeout_seconds = 15
+        self.max_retries = 2
+        self.user_agent = 'WeeklyBrief-NewsCollector/1.0'
         
         # セッション設定
         self.session = requests.Session()
@@ -44,78 +45,93 @@ class CompanyNewsCollector:
             'Connection': 'keep-alive',
         })
         
+        # レート制限対策
+        self.last_newsapi_request = 0
+        self.newsapi_min_interval = 1.5  # NewsAPIリクエスト間隔（秒）
+        
     def load_company_config(self, config_path: str) -> Dict:
-        """企業設定ファイルを読み込み"""
+        """企業設定ファイルを読み込み（統合版）"""
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
-                return yaml.safe_load(f)
+                config = yaml.safe_load(f)
+            
+            # companiesとadditional_targetsを統合
+            all_companies = {}
+            
+            if 'companies' in config:
+                all_companies.update(config['companies'])
+            
+            if 'additional_targets' in config:
+                all_companies.update(config['additional_targets'])
+            
+            # 設定の正規化（RSSフィード設定を統一）
+            for company_id, company_info in all_companies.items():
+                # blog_rss を rss_feeds に変換
+                if 'blog_rss' in company_info:
+                    company_info.setdefault('rss_feeds', []).append(company_info['blog_rss'])
+                
+                # blog_url を blog_urls に変換
+                if 'blog_url' in company_info:
+                    company_info.setdefault('blog_urls', []).append(company_info['blog_url'])
+                
+                # 各種URLをリストに変換
+                for url_key in ['news_url', 'research_url', 'deepmind_url']:
+                    if url_key in company_info:
+                        company_info.setdefault('news_urls', []).append(company_info[url_key])
+            
+            print(f"✅ 企業設定読み込み完了: {len(all_companies)}社")
+            return all_companies
+            
         except Exception as e:
-            print(f"❌ 設定ファイル読み込みエラー: {e}")
-            return {'companies': {}, 'additional_targets': {}}
+            print(f"❌ 企業設定読み込みエラー: {e}")
+            return {}
     
     def collect_all_company_news(self, days_back: int = 7) -> List[Dict[str, Any]]:
-        """
-        全企業のニュースを収集
+        """全企業のニュース収集（統合版）"""
+        all_news = []
         
-        Args:
-            days_back: 過去何日分のニュースを収集するか
-            
-        Returns:
-            ニュース記事のリスト
-        """
         print(f"🏢 企業ニュース収集開始 - 過去{days_back}日間")
         
-        all_news = []
-        all_companies = {**self.config.get('companies', {}), **self.config.get('additional_targets', {})}
-        
-        for company_id, company_info in all_companies.items():
-            print(f"\n📊 {company_info['name']} の収集中...")
-            
+        # 統合された企業リストを処理
+        for company_id, company_info in self.companies.items():
             try:
                 company_news = self.collect_company_news(company_id, company_info, days_back)
                 all_news.extend(company_news)
-                print(f"✅ {company_info['name']}: {len(company_news)}件収集")
-                
-                # レート制限対策
-                time.sleep(self.delay_seconds)
-                
             except Exception as e:
-                print(f"❌ {company_info['name']} 収集エラー: {e}")
+                print(f"❌ {company_info.get('name', company_id)} 収集エラー: {e}")
                 continue
         
         print(f"\n🎉 全企業収集完了: 合計{len(all_news)}件")
         return all_news
     
     def collect_company_news(self, company_id: str, company_info: Dict, days_back: int) -> List[Dict[str, Any]]:
-        """
-        特定企業のニュース収集
+        """特定企業のニュース収集（最適化版）"""
+        all_items = []
         
-        Args:
-            company_id: 企業ID
-            company_info: 企業情報
-            days_back: 過去何日分か
-            
-        Returns:
-            ニュース記事のリスト
-        """
-        news_items = []
+        print(f"\n📊 {company_info['name']} の収集中...")
         
-        # 1. RSS収集
-        rss_items = self.collect_rss_feeds(company_id, company_info, days_back)
-        news_items.extend(rss_items)
+        # RSS フィードがある場合は優先
+        if company_info.get('rss_feeds'):
+            rss_items = self.collect_rss_feeds(company_id, company_info, days_back)
+            all_items.extend(rss_items)
         
-        # 2. Web scraping収集
-        web_items = self.collect_web_content(company_id, company_info, days_back)
-        news_items.extend(web_items)
+        # Webスクレイピング
+        if company_info.get('blog_urls') or company_info.get('news_urls'):
+            web_items = self.collect_web_content(company_id, company_info, days_back)
+            all_items.extend(web_items)
         
-        # 3. NewsAPI検索（企業キーワードで）
-        if company_info.get('keywords'):
+        # NewsAPIは主要企業のみ（レート制限対策）
+        priority_companies = ['openai', 'google_ai', 'anthropic', 'microsoft', 'meta']
+        if company_id in priority_companies and company_info.get('keywords'):
             newsapi_items = self.collect_newsapi_content(company_id, company_info, days_back)
-            news_items.extend(newsapi_items)
+            all_items.extend(newsapi_items)
+        elif company_info.get('keywords'):
+            print(f"    ⚠️  NewsAPI: 主要企業以外はスキップ（レート制限対策）")
         
         # 重複除去
-        unique_items = self.remove_duplicates(news_items)
+        unique_items = self.remove_duplicates(all_items)
         
+        print(f"                                        ✅ {company_info['name']}: {len(unique_items)}件収集")
         return unique_items
     
     def collect_rss_feeds(self, company_id: str, company_info: Dict, days_back: int) -> List[Dict[str, Any]]:
@@ -309,13 +325,21 @@ class CompanyNewsCollector:
         return self.scrape_blog_page(research_url, company_id, days_back)
     
     def collect_newsapi_content(self, company_id: str, company_info: Dict, days_back: int) -> List[Dict[str, Any]]:
-        """NewsAPI で企業関連ニュース収集（統一フィルタリング版）"""
+        """NewsAPI で企業関連ニュース収集（レート制限対策版）"""
         items = []
         
         if not self.newsapi_key or not company_info.get('keywords'):
+            print(f"    ⚠️  NewsAPIキーまたはキーワードが未設定")
             return items
         
         try:
+            # レート制限対策：前回リクエストから間隔をあける
+            elapsed = time.time() - self.last_newsapi_request
+            if elapsed < self.newsapi_min_interval:
+                wait_time = self.newsapi_min_interval - elapsed
+                print(f"    ⏳ レート制限対策: {wait_time:.1f}秒待機")
+                time.sleep(wait_time)
+            
             print(f"  📰 NewsAPI検索: {company_info['keywords']}")
             
             # 企業名 + キーワードで検索
@@ -333,13 +357,25 @@ class CompanyNewsCollector:
                 "from": from_date
             }
             
-            response = requests.get(url, params=params, timeout=self.timeout_seconds)
-            response.raise_for_status()
+            self.last_newsapi_request = time.time()
+            response = self.session.get(url, params=params, timeout=self.timeout_seconds)
+            
+            # レート制限エラーの詳細処理
+            if response.status_code == 429:
+                print(f"    ⚠️  NewsAPIレート制限に達しました - スキップします")
+                return []
+            elif response.status_code == 401:
+                print(f"    ⚠️  NewsAPIキーが無効です - スキップします")
+                return []
+            elif response.status_code != 200:
+                print(f"    ⚠️  NewsAPIエラー: {response.status_code} - スキップします")
+                return []
             
             data = response.json()
             
-            if data.get("articles"):
-                for article in data["articles"]:
+            if data.get('status') == 'ok' and data.get('articles'):
+                for article in data['articles']:
+                    # 記事情報を構造化
                     item = {
                         'title': article.get("title", ""),
                         'url': article.get("url", ""),
@@ -358,8 +394,14 @@ class CompanyNewsCollector:
             print(f"    ✅ NewsAPI検索完了: {len(filtered_items)}件（フィルタ後）")
             return filtered_items
             
+        except requests.exceptions.Timeout:
+            print(f"    ⚠️  NewsAPIタイムアウト - スキップします")
+            return []
+        except requests.exceptions.RequestException as e:
+            print(f"    ⚠️  NewsAPI接続エラー: {str(e)[:50]}... - スキップします")
+            return []
         except Exception as e:
-            print(f"    ❌ NewsAPI検索エラー: {e}")
+            print(f"    ⚠️  NewsAPI処理エラー: {str(e)[:50]}... - スキップします")
             return []
     
     def extract_content_from_url(self, url: str) -> str:
