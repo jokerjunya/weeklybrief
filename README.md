@@ -141,12 +141,64 @@ python scripts/detailed-test.py
 ```
 
 ### 4. Webページ表示
+
+#### ローカル開発サーバー起動
 ```bash
 # ローカルサーバー起動
 cd web
 python -m http.server 8000
 # ブラウザで http://localhost:8000 にアクセス
 ```
+
+#### ngrokを使用した外部公開（Basic認証必須）
+
+**⚠️ セキュリティ要件**: 外部公開時は必ずBasic認証を設定してください
+
+##### 1. 環境変数の設定
+```bash
+# .envファイルを作成（.env.exampleをコピー）
+cp .env.example .env
+
+# .envファイルを編集してBasic認証情報を設定
+vim .env
+```
+
+##### 2. .envファイルの設定例
+```bash
+# ngrok Basic認証設定
+NGROK_AUTH_USER=your_username
+NGROK_AUTH_PASS=your_secure_password
+```
+
+##### 3. ngrok起動方法
+
+**方法A: 自動スクリプトを使用（推奨）**
+```bash
+# ngrok起動スクリプトを実行
+./scripts/start-ngrok.sh
+
+# カスタムポートを指定する場合
+./scripts/start-ngrok.sh 8080
+```
+
+**方法B: 手動コマンド実行**
+```bash
+# 環境変数を読み込み
+source .env
+
+# ngrokをBasic認証付きで起動
+ngrok http --basic-auth="$NGROK_AUTH_USER:$NGROK_AUTH_PASS" 8000
+```
+
+##### 4. アクセス方法
+1. ngrok起動後に表示されるHTTPS URLにアクセス
+2. Basic認証プロンプトでユーザー名・パスワードを入力
+3. 週次ビジネスレポートが表示されます
+
+**📝 注意事項:**
+- ngrokの無料プランでは同時接続数に制限があります
+- Basic認証情報は第三者に共有しないでください
+- 本番環境では、より強固な認証システムの使用を推奨します
 
 ## 🎨 Webページ機能
 

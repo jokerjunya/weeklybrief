@@ -47,6 +47,11 @@ Thumbs.db
 # Logs
 *.log
 
+# Environment variables
+.env
+.env.local
+.env.production
+
 # API Keys (if any config files contain them)
 *.key
 secrets/
