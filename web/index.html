@@ -48,6 +48,7 @@
                                 <div class="metric-title">
                                     <h3>Placement</h3>
                                     <span class="metric-type">内定数（※RDSを含まない。RAGのみ）</span>
+                                    <div class="metric-period">期間: 2025/06/09-2025/06/13</div>
                                 </div>
                                 <div class="metric-icon placement">
                                     <i class="fas fa-users"></i>
@@ -73,25 +74,32 @@
                             <div class="metric-header">
                                 <div class="metric-title">
                                     <h3>Online Platform</h3>
-                                    <span class="metric-type">売上（※グロースのスコア）</span>
+                                    <span class="metric-type">売上</span>
+                                    <div class="metric-period">期間: 2025/06/15-2025/06/22</div>
                                 </div>
                                 <div class="metric-icon online-platform">
                                     <i class="fas fa-yen-sign"></i>
                                 </div>
                             </div>
                             <div class="metric-value">
-                                <span class="value-number">23.2</span>
-                                <span class="value-unit">億円</span>
+                                <span class="value-number">37億7,244</span>
+                                <span class="value-unit">万円</span>
                             </div>
                             <div class="metric-changes">
-                                <div class="change-item negative">
-                                    <i class="fas fa-arrow-down"></i>
-                                    <span>前年同期比: -8.2%</span>
+                                <div class="change-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>前年同期比: +53.9%</span>
                                 </div>
                                 <div class="change-item negative">
                                     <i class="fas fa-arrow-down"></i>
-                                    <span>前週比: -40.8%</span>
+                                    <span>前週比: -3.6%</span>
                                 </div>
+                            </div>
+                            <div class="metric-data-link">
+                                <a href="https://idash.sandbox.indeed.net/workspace/88687/queries/2/visualizations/1" target="_blank" rel="noopener noreferrer">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    データを見る
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -101,7 +109,13 @@
                 <section class="section">
                     <div class="section-header">
                         <h2><i class="fas fa-chart-bar"></i>株価情報</h2>
-                        <p class="section-subtitle">主要株価の最新動向</p>
+                        <div class="section-actions">
+                            <p class="section-subtitle">主要株価の最新動向</p>
+                            <button id="refreshStockBtn" class="refresh-btn" title="株価を更新">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>更新</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="stock-grid">
                         <div class="stock-card">

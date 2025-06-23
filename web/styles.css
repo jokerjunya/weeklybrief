@@ -208,6 +208,15 @@ body {
   line-height: 1.4;
 }
 
+.metric-period {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 4px;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
 .metric-icon {
   width: 32px;
   height: 32px;
@@ -296,6 +305,34 @@ body {
 .progress-label {
   font-size: 0.7rem;
   color: var(--text-tertiary);
+}
+
+/* Metric Data Link */
+.metric-data-link {
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-color);
+}
+
+.metric-data-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.metric-data-link a:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.metric-data-link a i {
+  font-size: 0.7rem;
+  opacity: 0.8;
 }
 
 /* Compact Stock Grid */
@@ -1131,4 +1168,246 @@ button:focus,
     text-align: center;
     padding: 2rem;
     font-weight: 500;
+}
+
+/* 更新ボタンのスタイル - モダンデザイン */
+.section-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.refresh-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+        0 4px 15px rgba(102, 126, 234, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.refresh-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 8px 25px rgba(102, 126, 234, 0.4),
+        0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.refresh-btn:hover::before {
+    left: 100%;
+}
+
+.refresh-btn:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.refresh-btn.loading {
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    animation: pulse 2s infinite;
+}
+
+.refresh-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+.refresh-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 
+        0 4px 15px rgba(16, 185, 129, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: successPulse 0.6s ease-out;
+}
+
+.refresh-btn.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 
+        0 4px 15px rgba(239, 68, 68, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* ダークモード対応 */
+.dark-mode .refresh-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 
+        0 4px 15px rgba(79, 70, 229, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .refresh-btn:hover {
+    box-shadow: 
+        0 8px 25px rgba(79, 70, 229, 0.4),
+        0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.dark-mode .refresh-btn.loading {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+}
+
+.dark-mode .refresh-btn.success {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 
+        0 4px 15px rgba(5, 150, 105, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .refresh-btn.error {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 
+        0 4px 15px rgba(220, 38, 38, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 通知システムのスタイル */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    z-index: 1000;
+    min-width: 300px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.notification-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.notification-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.notification i:first-child {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.notification span {
+    flex: 1;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.notification-close i {
+    font-size: 0.8rem;
+}
+
+/* アイコンのアニメーション効果 */
+.refresh-btn i {
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.refresh-btn:hover i {
+    transform: rotate(180deg);
+}
+
+.refresh-btn.loading i {
+    animation: spin 1s linear infinite;
+    color: #e5e7eb;
+}
+
+.refresh-btn.success i {
+    animation: bounceIn 0.6s ease-out;
+    color: #ffffff;
+}
+
+.refresh-btn.error i {
+    animation: shake 0.5s ease-in-out;
+    color: #ffffff;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
 } 

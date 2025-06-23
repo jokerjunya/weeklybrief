@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "generated_at": "2025-06-23T07:52:32",
+    "data_period": "2025-06-16 to 2025-06-23",
+    "version": "1.0"
+  },
+  "business_data": {
+    "services": [
+      {
+        "name": "Placement",
+        "metric_type": "内定数",
+        "current_value": 2739,
+        "previous_year_value": 2916,
+        "previous_week_value": 2550,
+        "yoy_change": -6.1,
+        "weekly_change": 7.4
+      },
+      {
+        "name": "Online Platform",
+        "metric_type": "売上",
+        "current_value": 3220771356,
+        "previous_week_value": 3921002578,
+        "previous_year_value": 2525919363,
+        "yoy_change": 27.5,
+        "weekly_change": -17.9
+      }
+    ]
+  },
+  "stock_data": {
+    "N225": {
+      "current_price": 38403.23,
+      "change": -85.11,
+      "change_percent": -0.22,
+      "currency": "JPY",
+      "status": "success"
+    },
+    "SPY": {
+      "current_price": 594.28,
+      "current_price_jpy": 89142.0,
+      "change": -1.4,
+      "change_jpy": -210.0,
+      "change_percent": -0.23,
+      "currency": "USD",
+      "status": "success"
+    },
+    "RCRUY": {
+      "current_price": 10.53,
+      "current_price_jpy": 1579.0,
+      "change": -0.4,
+      "change_jpy": -61.0,
+      "change_percent": -3.7,
+      "currency": "USD",
+      "status": "success"
+    }
+  },
+  "news_data": {
+    "summary": "今週のAI・テクノロジーニュースでは、精度向上と実用化が主なトレンド...",
+    "articles": [
+      {
+        "title": "Sample News Title",
+        "summary_jp": "ニュース要約",
+        "url": "https://example.com",
+        "published_at": "2025-06-21",
+        "company": "openai",
+        "score": 5.2
+      }
+    ]
+  },
+  "schedule_data": [
+    {
+      "date": "2025-06-24",
+      "time": "09:00",
+      "title": "JP HR Steering Committee",
+      "weekday": "火"
+    }
+  ]
+} 
