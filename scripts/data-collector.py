@@ -81,41 +81,36 @@ class DataCollector:
             # yfinanceを使用して株価データを取得
             import yfinance as yf
             
-            tickers = ['N225', 'SPY', 'RCRUY']
+            tickers = ['N225', 'SPY', 'RECRUIT']
             for ticker in tickers:
                 try:
                     if ticker == 'N225':
                         # 日経平均
                         stock = yf.Ticker('^N225')
                     elif ticker == 'SPY':
-                        # S&P 500 ETF
-                        stock = yf.Ticker('SPY')
-                    elif ticker == 'RCRUY':
-                        # リクルートHD ADR
-                        stock = yf.Ticker('RCRUY')
+                        # S&P 500 Index
+                        stock = yf.Ticker('^GSPC')
+                    elif ticker == 'RECRUIT':
+                        # リクルートHD（東証）
+                        stock = yf.Ticker('6098.T')
                     
-                    hist = stock.history(period='2d')
-                    if len(hist) >= 2:
+                    # 当日のデータを取得（1分間隔で当日分）
+                    hist = stock.history(period='1d', interval='1m')
+                    if len(hist) >= 1:
                         current_price = hist['Close'].iloc[-1]
-                        prev_price = hist['Close'].iloc[-2]
-                        change = current_price - prev_price
-                        change_percent = (change / prev_price) * 100
+                        open_price = hist['Open'].iloc[0]  # 当日始値
+                        change = current_price - open_price
+                        change_percent = (change / open_price) * 100
                         
                         stock_data[ticker] = {
                             "current_price": round(current_price, 2),
                             "change": round(change, 2),
                             "change_percent": round(change_percent, 2),
-                            "currency": "JPY" if ticker == 'N225' else "USD",
+                            "currency": "JPY",
                             "status": "success"
                         }
                         
-                        # USD銘柄は円換算も追加
-                        if ticker != 'N225':
-                            usd_to_jpy = 150  # 仮レート
-                            stock_data[ticker]["current_price_jpy"] = round(current_price * usd_to_jpy)
-                            stock_data[ticker]["change_jpy"] = round(change * usd_to_jpy)
-                        
-                        print(f"   ✅ {ticker}: ¥{stock_data[ticker].get('current_price_jpy', stock_data[ticker]['current_price'])}")
+                        print(f"   ✅ {ticker}: ¥{stock_data[ticker]['current_price']}")
                     
                 except Exception as e:
                     print(f"   ⚠️ {ticker} 取得エラー: {e}")
@@ -433,40 +428,34 @@ class DataCollector:
         ]
     
     def _get_mock_stock_data(self):
-        """模擬株価データ"""
+        """模擬株価データ（当日始値との比較）"""
         return {
             "N225": {
                 "current_price": 38403.23,
-                "change": -85.11,
-                "change_percent": -0.22,
+                "change": -120.45,
+                "change_percent": -0.31,
                 "currency": "JPY",
                 "status": "success"
             },
             "SPY": {
-                "current_price": 594.28,
-                "current_price_jpy": 89142.0,
-                "change": -1.4,
-                "change_jpy": -210.0,
-                "change_percent": -0.23,
+                "current_price": 5945.0,  # S&P 500 Index
+                "change": -42.0,
+                "change_percent": -0.70,
                 "currency": "USD",
                 "status": "success"
             },
-            "RCRUY": {
-                "current_price": 10.53,
-                "current_price_jpy": 1579.0,
-                "change": -0.4,
-                "change_jpy": -61.0,
-                "change_percent": -3.7,
-                "currency": "USD",
+            "RECRUIT": {
+                "current_price": 1579.0,  # 円換算表示
+                "change": -61.0,
+                "change_percent": -3.70,
+                "currency": "JPY",
                 "status": "success"
             }
         }
     
     def _get_period_description(self):
         """期間説明を生成"""
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=7)
-        return f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        return "2025年06月23日"
 
     def _determine_company(self, keyword, title):
         """企業判定ロジック"""

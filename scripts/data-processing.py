@@ -6,12 +6,15 @@ Power Automateから呼び出し可能な形式でデータを処理
 
 import json
 import os
-import pandas as pd
-from datetime import datetime, timedelta
+import sys
 import requests
-from typing import Dict, List, Any
+import pandas as pd
+import yaml
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
 from news_summarizer import NewsSummarizer
 from local_llm_summarizer import LocalLLMSummarizer
+import yfinance as yf
 
 class WeeklyReportProcessor:
     def __init__(self, config_path: str = "config/settings.json"):
@@ -31,7 +34,7 @@ class WeeklyReportProcessor:
         ビジネスデータを処理（Placement: 内定数、Online Platform: 売上）
         """
         # Online Platform（サービスB）の実データパス
-        online_platform_csv = "/Users/01062544/Downloads/Revenue_non-RAG_jp_weekly_WoW&YoY.csv"
+        online_platform_csv = "data/revenue_data.csv"
         
         # Placement（サービスA）の内定数データ - 実データに更新
         placement_current = 2739    # 今週の内定数
@@ -45,6 +48,7 @@ class WeeklyReportProcessor:
         placement_data = {
             "name": "Placement",
             "metric_type": "内定数",
+            "period": "2025/06/09-2025/06/13",
             "current_value": placement_current,
             "previous_year_value": placement_previous_year,
             "previous_week_value": placement_previous_week,
@@ -61,6 +65,7 @@ class WeeklyReportProcessor:
             {
                 "name": "Online Platform",
                 "metric_type": "売上",
+                "period": "2025/06/15-2025/06/22",
                 "current_value": online_platform_data["current_sales"],
                 "previous_week_value": online_platform_data.get("previous_week_sales"),
                 "previous_year_value": online_platform_data["previous_year_sales"],
@@ -85,14 +90,14 @@ class WeeklyReportProcessor:
             
             df = pd.read_csv(csv_path)
             
-            # CSVファイルの構造: this_week_revenue_jpy,last_week_revenue_jpy,last_year_same_week_revenue_jpy,wow_pct,yoy_pct
+            # 新しいCSVファイルの構造: last_week_revenue_jpy,two_weeks_ago_revenue_jpy,last_year_last_week_revenue_jpy,wow_pct,yoy_pct
             row = df.iloc[0]  # 最初の行を取得
             
-            current_sales = int(row['this_week_revenue_jpy'])
-            previous_week_sales = int(row['last_week_revenue_jpy'])
-            previous_year_sales = int(row['last_year_same_week_revenue_jpy'])
-            wow_pct = float(row['wow_pct'])
-            yoy_pct = float(row['yoy_pct'])
+            current_sales = int(row['last_week_revenue_jpy'])  # 今週の売上（last_week_revenue_jpy）
+            previous_week_sales = int(row['two_weeks_ago_revenue_jpy'])  # 前週の売上（two_weeks_ago_revenue_jpy）
+            previous_year_sales = int(row['last_year_last_week_revenue_jpy'])  # 前年同週の売上
+            wow_pct = float(row['wow_pct'].replace('%', '')) if isinstance(row['wow_pct'], str) else float(row['wow_pct'])
+            yoy_pct = float(row['yoy_pct'].replace('%', '')) if isinstance(row['yoy_pct'], str) else float(row['yoy_pct'])
             
             return {
                 "name": "Online Platform",
@@ -122,152 +127,71 @@ class WeeklyReportProcessor:
     
     def fetch_stock_data(self, tickers: List[str]) -> Dict[str, Any]:
         """
-        株価データを取得・処理（日経平均はYahoo Finance、その他はAlpha Vantage）
+        yfinanceを使用して株価データを取得・処理
         """
         stock_data = {}
         
+        # ティッカーシンボルのマッピング（yfinance用）
+        ticker_mapping = {
+            "N225": "^N225",     # 日経平均株価
+            "SPY": "^GSPC",      # S&P 500 Index
+            "RECRUIT": "6098.T"  # リクルートHD（東証）
+        }
+        
         for ticker in tickers:
-            if ticker == "N225":
-                # 日経平均はYahoo Finance APIを使用
-                stock_data[ticker] = self._fetch_nikkei_from_yahoo()
-            else:
-                # その他はAlpha Vantage APIを使用
-                stock_data[ticker] = self._fetch_stock_from_alpha_vantage(ticker)
+            yf_ticker = ticker_mapping.get(ticker, ticker)
+            stock_data[ticker] = self._fetch_stock_from_yfinance(yf_ticker, ticker)
         
         return stock_data
     
-    def _fetch_nikkei_from_yahoo(self) -> Dict[str, Any]:
+    def _fetch_stock_from_yfinance(self, yf_ticker: str, original_ticker: str) -> Dict[str, Any]:
         """
-        Yahoo Finance APIから日経平均株価を取得
+        yfinanceから株価データを取得
+        
+        Args:
+            yf_ticker: yfinance用のティッカーシンボル
+            original_ticker: 元のティッカーシンボル
         """
         try:
-            import time
-            import json
+            # yfinanceでデータ取得
+            stock = yf.Ticker(yf_ticker)
             
-            # レート制限を避けるため少し待機
-            time.sleep(2)
+            # 基本情報取得
+            info = stock.info
             
-            # 複数のエンドポイントを試行
-            urls = [
-                "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225",
-                "https://query2.finance.yahoo.com/v8/finance/chart/%5EN225"
-            ]
+            # 当日のデータを取得（1分間隔で当日分）
+            hist = stock.history(period="1d", interval="1m")
             
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "application/json",
-                "Accept-Language": "en-US,en;q=0.9",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Referer": "https://finance.yahoo.com/"
-            }
-            
-            for url in urls:
-                try:
-                    params = {
-                        "interval": "1d",
-                        "range": "5d",  # 5日分取得してより安定したデータを取得
-                        "includePrePost": "false"
-                    }
-                    
-                    response = requests.get(url, params=params, headers=headers, timeout=15)
-                    print(f"Yahoo Finance response status: {response.status_code}")
-                    
-                    if response.status_code == 200:
-                        try:
-                            data = response.json()
-                        except json.JSONDecodeError:
-                            print(f"JSON decode error. Response text: {response.text[:200]}")
-                            continue
-                        
-                        if "chart" in data and data["chart"]["result"] and len(data["chart"]["result"]) > 0:
-                            result = data["chart"]["result"][0]
-                            
-                            if "indicators" in result and "quote" in result["indicators"]:
-                                closes = result["indicators"]["quote"][0]["close"]
-                                
-                                # Noneを除去して有効な価格データのみを取得
-                                valid_closes = [price for price in closes if price is not None]
-                                
-                                if len(valid_closes) >= 2:
-                                    current_price = valid_closes[-1]  # 最新価格
-                                    previous_price = valid_closes[-2]  # 前営業日価格
-                                    
-                                    change = current_price - previous_price
-                                    change_percent = (change / previous_price) * 100
-                                    
-                                    return {
-                                        "current_price": round(current_price, 2),
-                                        "change": round(change, 2),
-                                        "change_percent": round(change_percent, 2)
-                                    }
-                        
-                        print(f"Unexpected data structure: {list(data.keys()) if 'data' in locals() else 'No data'}")
-                    
-                except requests.exceptions.RequestException as e:
-                    print(f"Request error for {url}: {e}")
-                    continue
-            
-            # 全てのエンドポイントで失敗した場合、フォールバック値を返す
-            print("⚠️  Yahoo Finance API取得に失敗、フォールバック値を使用")
-            return {
-                "current_price": 38486.29,  # 正確な現在値
-                "change": -2.05,
-                "change_percent": -0.01,
-                "note": "Yahoo Finance API unavailable - using fallback value"
-            }
+            if not hist.empty:
+                current_price = hist['Close'].iloc[-1]
+                open_price = hist['Open'].iloc[0]  # 当日始値
+                
+                change = current_price - open_price
+                change_percent = (change / open_price) * 100 if open_price != 0 else 0
+                
+                # 通貨情報を取得
+                currency = info.get("currency", "JPY")
+                
+                # 全て日本円表示に統一
+                return {
+                    "current_price": round(float(current_price), 2),
+                    "change": round(float(change), 2),
+                    "change_percent": round(float(change_percent), 2),
+                    "currency": "JPY",
+                    "status": "success"
+                }
+            else:
+                return {
+                    "error": "履歴データが取得できませんでした",
+                    "status": "failed"
+                }
                 
         except Exception as e:
-            print(f"Error fetching Nikkei 225 from Yahoo Finance: {e}")
+            print(f"Error fetching {yf_ticker}: {e}")
             return {
-                "current_price": 38486.29,  # 正確な現在値
-                "change": -2.05,
-                "change_percent": -0.01,
-                "error": f"Yahoo Finance API error: {str(e)}"
+                "error": str(e),
+                "status": "error"
             }
-    
-    def _fetch_stock_from_alpha_vantage(self, ticker: str) -> Dict[str, Any]:
-        """
-        Alpha Vantage APIから株価データを取得
-        """
-        try:
-            api_key = self.config["data_sources"]["stock_data"]["api_key"]
-            url = f"https://www.alphavantage.co/query"
-            params = {
-                "function": "TIME_SERIES_DAILY",
-                "symbol": ticker,
-                "apikey": api_key
-            }
-            response = requests.get(url, params=params)
-            data = response.json()
-            
-            # 最新の株価情報を抽出
-            if "Time Series (Daily)" in data:
-                time_series = data["Time Series (Daily)"]
-                dates = list(time_series.keys())
-                if dates:
-                    latest_date = dates[0]
-                    latest_data = time_series[latest_date]
-                    previous_date = dates[1] if len(dates) > 1 else dates[0]
-                    previous_data = time_series[previous_date]
-                    
-                    current_price = float(latest_data["4. close"])
-                    previous_price = float(previous_data["4. close"])
-                    change = current_price - previous_price
-                    change_percent = (change / previous_price) * 100
-                    
-                    return {
-                        "current_price": current_price,
-                        "change": round(change, 2),
-                        "change_percent": round(change_percent, 2)
-                    }
-                else:
-                    return {"error": "No data available"}
-            else:
-                return {"error": f"Unexpected response format: {list(data.keys())}"}
-                                     
-        except Exception as e:
-            print(f"Error processing {ticker}: {e}")
-            return {"error": str(e)}
     
     def fetch_news_data(self, keywords: List[str]) -> List[Dict[str, Any]]:
         """
@@ -362,8 +286,12 @@ class WeeklyReportProcessor:
         """GNews APIからニュースを取得"""
         articles = []
         
-        # GNews APIキーを設定に追加（フリープラン使用）
-        gnews_api_key = "your_gnews_api_key_here"  # 実際のキーに置き換え
+        # 設定ファイルからGNews APIキーを取得
+        gnews_api_key = self.config["data_sources"]["news_data"].get("gnews_api_key")
+        
+        if not gnews_api_key:
+            print("⚠️ GNews APIキーが設定されていません")
+            return articles
         
         for keyword in keywords:
             try:
@@ -470,11 +398,26 @@ class WeeklyReportProcessor:
             if "error" not in data:
                 name = ticker_names.get(ticker, ticker)
                 change_color = "green" if data.get('change_percent', 0) > 0 else "red"
+                
+                # 円表示に統一
+                if data.get('currency') == 'JPY':
+                    # 日経平均（JPY）
+                    price_display = f"¥{data['current_price']:,.0f}"
+                    change_display = f"{data['change']:+,.0f}"
+                elif 'current_price_jpy' in data:
+                    # USD銘柄は円換算値を使用
+                    price_display = f"¥{data['current_price_jpy']:,.0f}"
+                    change_display = f"{data['change_jpy']:+,.0f}"
+                else:
+                    # フォールバック：USD表示
+                    price_display = f"${data['current_price']:.2f}"
+                    change_display = f"{data['change']:+.2f}"
+                
                 stock_rows.append(f"""
                     <tr>
                         <td>{name} ({ticker})</td>
-                        <td>{data.get('current_price', 'N/A')}</td>
-                        <td style="color: {change_color};">{data.get('change', 'N/A')}</td>
+                        <td>{price_display}</td>
+                        <td style="color: {change_color};">{change_display}</td>
                         <td style="color: {change_color};">{data.get('change_percent', 'N/A')}%</td>
                     </tr>
                 """)
@@ -491,22 +434,33 @@ class WeeklyReportProcessor:
             "stock_table": stock_html
         }
     
-    def format_japanese_currency(self, amount: int) -> str:
+    def format_japanese_currency(self, amount: int, detailed: bool = False) -> str:
         """
         日本円を日本式表記（億円、万円）でフォーマット
         
         Args:
             amount (int): 金額（円）
+            detailed (bool): 詳細表示（万円まで表示）
         
         Returns:
             str: フォーマットされた金額文字列
         """
         if amount >= 100000000:  # 1億円以上
             oku = amount / 100000000
-            if oku >= 10:
-                return f"{oku:.0f}億円"
+            if detailed:
+                # 詳細表示：37億7,244万円のような形式
+                oku_part = int(amount // 100000000)
+                man_part = int((amount % 100000000) // 10000)
+                if man_part > 0:
+                    return f"{oku_part}億{man_part:,}万円"
+                else:
+                    return f"{oku_part}億円"
             else:
-                return f"{oku:.1f}億円"
+                # 通常表示
+                if oku >= 10:
+                    return f"{oku:.0f}億円"
+                else:
+                    return f"{oku:.1f}億円"
         elif amount >= 10000:  # 1万円以上
             man = amount / 10000
             if man >= 100:

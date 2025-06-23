@@ -88,7 +88,7 @@ class ReportGenerator:
         
         # ヘッダー
         period = data['metadata']['data_period']
-        content.append(f"# 週次レポート")
+        content.append(f"# PresidentOffice Weekly Brief")
         content.append(f"**期間**: {period}")
         content.append(f"**生成日時**: {data['metadata']['generated_at']}")
         content.append("")
@@ -117,12 +117,15 @@ class ReportGenerator:
                 # Online Platformの場合は詳細表示（万円まで）
                 detailed = (name == "Online Platform")
                 current_display = self._get_processor().format_japanese_currency(current_value, detailed=detailed)
+                if name == "Online Platform":
+                    current_display += " ※グロスレベニュー"
             
             content.append(f"- **今週の{metric_type}**: {current_display}")
             
             # 前年同期比
             yoy_icon = "📈" if yoy_change > 0 else "📉" if yoy_change < 0 else "➡️"
-            content.append(f"- **前年同期比**: {yoy_icon} {yoy_change:+.1f}%")
+            yoy_note = " ※昨年のPPCと比較" if name == "Online Platform" else ""
+            content.append(f"- **前年同期比**: {yoy_icon} {yoy_change:+.1f}%{yoy_note}")
             
             # 前週比
             weekly_icon = "📈" if weekly_change > 0 else "📉" if weekly_change < 0 else "➡️"
@@ -143,13 +146,17 @@ class ReportGenerator:
             if stock_info['status'] == 'success':
                 if ticker == 'N225':
                     name = "日経平均株価"
-                    price_display = f"¥{stock_info['current_price']:,.2f}"
                 elif ticker == 'SPY':
-                    name = "S&P 500 ETF"
-                    price_display = f"${stock_info['current_price']:.2f} / ¥{stock_info['current_price_jpy']:,}"
-                elif ticker == 'RCRUY':
-                    name = "リクルートHD (ADR)"
-                    price_display = f"${stock_info['current_price']:.2f} / ¥{stock_info['current_price_jpy']:,}"
+                    name = "S&P 500"
+                elif ticker == 'RECRUIT':
+                    name = "リクルートHD"
+                
+                if ticker == 'SPY':
+                    # S&P 500はポイント表示
+                    price_display = f"{stock_info['current_price']:,.0f}"
+                else:
+                    # その他は円表示
+                    price_display = f"¥{stock_info['current_price']:,.0f}"
                 
                 change_icon = "📈" if stock_info['change'] > 0 else "📉" if stock_info['change'] < 0 else "➡️"
                 content.append(f"### {name}")
@@ -251,9 +258,12 @@ class ReportGenerator:
                 # Online Platformの場合は詳細表示（万円まで）
                 detailed = (name == "Online Platform")
                 current_display = self._get_processor().format_japanese_currency(current_value, detailed=detailed)
+                if name == "Online Platform":
+                    current_display += " ※グロスレベニュー"
             
             yoy_class = "positive" if yoy_change > 0 else "negative" if yoy_change < 0 else ""
             weekly_class = "positive" if weekly_change > 0 else "negative" if weekly_change < 0 else ""
+            yoy_note = " ※昨年のPPCと比較" if name == "Online Platform" else ""
             
             # Online Platformの場合はデータリンクを追加
             data_link = ""
@@ -270,7 +280,7 @@ class ReportGenerator:
                 <h3>{name}</h3>
                 {period_info}
                 <p><strong>今週の{metric_type}</strong>: {current_display}</p>
-                <p><strong>前年同期比</strong>: <span class="{yoy_class}">{yoy_change:+.1f}%</span></p>
+                <p><strong>前年同期比</strong>: <span class="{yoy_class}">{yoy_change:+.1f}%{yoy_note}</span></p>
                 <p><strong>前週比</strong>: <span class="{weekly_class}">{weekly_change:+.1f}%</span></p>
                 {data_link}
             </div>
@@ -282,13 +292,17 @@ class ReportGenerator:
             if stock_info['status'] == 'success':
                 if ticker == 'N225':
                     name = "日経平均株価"
-                    price_display = f"¥{stock_info['current_price']:,.2f}"
                 elif ticker == 'SPY':
-                    name = "S&P 500 ETF"
-                    price_display = f"${stock_info['current_price']:.2f} / ¥{stock_info['current_price_jpy']:,}"
-                elif ticker == 'RCRUY':
-                    name = "リクルートHD (ADR)"
-                    price_display = f"${stock_info['current_price']:.2f} / ¥{stock_info['current_price_jpy']:,}"
+                    name = "S&P 500"
+                elif ticker == 'RECRUIT':
+                    name = "リクルートHD"
+                
+                if ticker == 'SPY':
+                    # S&P 500はポイント表示
+                    price_display = f"{stock_info['current_price']:,.0f}"
+                else:
+                    # その他は円表示
+                    price_display = f"¥{stock_info['current_price']:,.0f}"
                 
                 change_class = "positive" if stock_info['change'] > 0 else "negative" if stock_info['change'] < 0 else ""
                 
@@ -354,7 +368,8 @@ class ReportGenerator:
                 "period": service.get('period', ''),
                 "currentValue": service['current_value'],
                 "yoyChange": service['yoy_change'],
-                "weeklyChange": service['weekly_change']
+                "weeklyChange": service['weekly_change'],
+                "yoyNote": " ※昨年のPPCと比較" if service['name'] == "Online Platform" else ""
             }
             
             if service['metric_type'] == '内定数':
@@ -362,7 +377,10 @@ class ReportGenerator:
             else:
                 # Online Platformの場合は詳細表示（万円まで）
                 detailed = (service['name'] == "Online Platform")
-                web_service["displayValue"] = self._get_processor().format_japanese_currency(service['current_value'], detailed=detailed)
+                display_value = self._get_processor().format_japanese_currency(service['current_value'], detailed=detailed)
+                if service['name'] == "Online Platform":
+                    display_value += " ※グロスレベニュー"
+                web_service["displayValue"] = display_value
             
             web_data["businessData"]["services"].append(web_service)
         

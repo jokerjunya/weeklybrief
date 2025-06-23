@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2025-06-23T09:22:58.699670",
-    "data_period": "2025-06-16 to 2025-06-23",
+    "generated_at": "2025-06-23T12:10:54.320961",
+    "data_period": "2025年06月23日",
     "version": "1.0"
   },
   "businessData": {
@@ -13,6 +13,7 @@
         "currentValue": 2739,
         "yoyChange": -6.1,
         "weeklyChange": 7.4,
+        "yoyNote": "",
         "displayValue": "2,739件"
       },
       {
@@ -22,35 +23,32 @@
         "currentValue": 3772444054,
         "yoyChange": 53.9,
         "weeklyChange": -3.6,
-        "displayValue": "37億7,244万円"
+        "yoyNote": " ※昨年のPPCと比較",
+        "displayValue": "37億7,244万円 ※グロスレベニュー"
       }
     ]
   },
   "stockData": {
     "N225": {
-      "current_price": 38202.68,
-      "change": -200.55,
-      "change_percent": -0.52,
+      "current_price": 38175.63,
+      "change": -85.06,
+      "change_percent": -0.22,
       "currency": "JPY",
       "status": "success"
     },
     "SPY": {
-      "current_price": 594.28,
-      "change": -1.4,
-      "change_percent": -0.23,
-      "currency": "USD",
-      "status": "success",
-      "current_price_jpy": 89142,
-      "change_jpy": -210
+      "current_price": 5968.34,
+      "change": -31.33,
+      "change_percent": -0.52,
+      "currency": "JPY",
+      "status": "success"
     },
-    "RCRUY": {
-      "current_price": 10.53,
-      "change": -0.4,
-      "change_percent": -3.7,
-      "currency": "USD",
-      "status": "success",
-      "current_price_jpy": 1579,
-      "change_jpy": -61
+    "RECRUIT": {
+      "current_price": 7782.0,
+      "change": 92.0,
+      "change_percent": 1.2,
+      "currency": "JPY",
+      "status": "success"
     }
   },
   "newsData": {
@@ -75,12 +73,21 @@
         "source": "日経新聞"
       },
       {
+        "title": "OpenAI removes ‘io’ branding mentions over trademark lawsuit",
+        "summary_jp": "OpenAI says the content was taken offline following a court order tied to a startup spun out of Google’s moonshot factory....",
+        "url": "https://9to5mac.com/2025/06/22/openai-an-jony-ive-remove-io-branding-mentions-trademark-lawsuit/",
+        "published_at": "2025-06-22",
+        "company": "openai",
+        "score": 5.0,
+        "source": "GNews"
+      },
+      {
         "title": "ChatGPT：生物兵器のリスクは現実的",
         "summary_jp": "OpenAI 警告した that ChatGPT 知ることになる 作り方を 生物兵器 and 説明した what it’s doing to 防ぐため it from 支援する 悪意のある行為者....",
         "url": "https://bgr.com/tech/heres-why-chatgpt-needs-to-know-how-to-make-bioweapons/",
         "published_at": "2025-06-20",
         "company": "openai",
-        "score": 5.0,
+        "score": 5.3,
         "source": "GNews"
       },
       {
@@ -89,16 +96,16 @@
         "url": "https://venturebeat.com/ai/anthropic-study-leading-ai-models-show-up-to-96-blackmail-rate-against-executives/",
         "published_at": "2025-06-20",
         "company": "anthropic",
-        "score": 5.3,
+        "score": 5.0,
         "source": "GNews"
       },
       {
-        "title": "ニューヨーク・デイリー・ニュースなどがOpenAIのデータ削除継続要求を裁判官に却下するよう求める",
-        "summary_jp": "The 新聞社 say ChatGPT's 親会社 has あらゆる手段を使った in the book to 隠す its 盗作....",
-        "url": "https://www.mercurynews.com/2025/06/18/daily-news-and-other-outlets-ask-judge-to-reject-openai-effort-to-keep-deleting-data/",
-        "published_at": "2025-06-18",
-        "company": "openai",
-        "score": 5.0,
+        "title": "Want to write a book? This specialized AI makes it easy.",
+        "summary_jp": "Tap into popular AIモデル like ChatGPT and Claude with Youbooks, a new AI book writer that helps you pull together full nonfiction books....",
+        "url": "https://www.cultofmac.com/deals/youbooks-ai-book-writer-deal",
+        "published_at": "2025-06-22",
+        "company": "chatgpt",
+        "score": 5.3,
         "source": "GNews"
       },
       {
@@ -107,7 +114,7 @@
         "url": "https://bgr.com/tech/heres-why-chatgpt-needs-to-know-how-to-make-bioweapons/",
         "published_at": "2025-06-20",
         "company": "openai",
-        "score": 5.3,
+        "score": 5.0,
         "source": "GNews"
       },
       {
@@ -115,15 +122,6 @@
         "summary_jp": "A 新しい方法 to use ChatGPT for 求める人のための より多くの 生産性....",
         "url": "https://www.tomsguide.com/ai/chatgpt-can-send-reminders-and-set-to-do-lists-use-these-four-prompts-for-maximum-productivity",
         "published_at": "2025-06-19",
-        "company": "openai",
-        "score": 5.0,
-        "source": "GNews"
-      },
-      {
-        "title": "ニューヨーク・デイリー・ニュースなどがOpenAIのデータ削除継続要求を裁判官に却下するよう求める",
-        "summary_jp": "The 新聞社 say ChatGPT's 親会社 has あらゆる手段を使った in the book to 隠す its 盗作....",
-        "url": "https://www.mercurynews.com/2025/06/18/daily-news-and-other-outlets-ask-judge-to-reject-openai-effort-to-keep-deleting-data/",
-        "published_at": "2025-06-18",
         "company": "openai",
         "score": 5.3,
         "source": "GNews"

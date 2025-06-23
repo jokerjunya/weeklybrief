@@ -101,50 +101,46 @@ class WeeklyReportApp {
 
     async loadStockData() {
         try {
-            // 最新のレポートファイルから株価データを取得
+            // news-data.jsonから統合データを取得
             const response = await fetch('news-data.json');
             if (response.ok) {
                 const data = await response.json();
-                // news-data.jsonには株価データがないので、代替手段を使用
                 
-                // 株価データをテスト用API呼び出しで取得
-                const testResponse = await fetch('/api/stock-data');
-                if (!testResponse.ok) {
-                    // APIが利用できない場合、静的データを使用
-                    console.warn('⚠️ 株価APIが利用できません。静的データを使用します。');
-                    this.updateStockDisplay({
-                        "N225": {
-                            "current_price": 38403.23,
-                            "change": -85.11,
-                            "change_percent": -0.22,
-                            "currency": "JPY"
-                        },
-                        "SPY": {
-                            "current_price": 594.28,
-                            "current_price_jpy": 89142.0,
-                            "change": -1.4,
-                            "change_jpy": -210.0,
-                            "change_percent": -0.23,
-                            "currency": "USD"
-                        },
-                        "RCRUY": {
-                            "current_price": 10.53,
-                            "current_price_jpy": 1579.0,
-                            "change": -0.4,
-                            "change_jpy": -61.0,
-                            "change_percent": -3.7,
-                            "currency": "USD"
-                        }
-                    });
+                // 統合データに株価情報があるかチェック
+                if (data.stockData && Object.keys(data.stockData).length > 0) {
+                    console.log('✅ 統合データから株価情報を取得');
+                    this.updateStockDisplay(data.stockData);
                     return;
                 }
-                
-                const stockData = await testResponse.json();
-                this.updateStockDisplay(stockData);
-                
-            } else {
-                throw new Error('Failed to connect to stock data source');
             }
+            
+            // フォールバック：最新のyfinanceデータを使用
+            console.warn('⚠️ 統合データに株価情報がないため、最新データを使用');
+            this.updateStockDisplay({
+                "N225": {
+                    "current_price": 38191.27,
+                    "change": -211.96,
+                    "change_percent": -0.55,
+                    "currency": "JPY"
+                },
+                "SPY": {
+                    "current_price": 594.28,
+                    "current_price_jpy": 89142.0,
+                    "change": -1.4,
+                    "change_jpy": -210.0,
+                    "change_percent": -0.23,
+                    "currency": "USD"
+                },
+                "RCRUY": {
+                    "current_price": 10.53,
+                    "current_price_jpy": 1579.0,
+                    "change": -0.4,
+                    "change_jpy": -61.0,
+                    "change_percent": -3.7,
+                    "currency": "USD"
+                }
+            });
+                
         } catch (error) {
             console.error('株価データの読み込みに失敗しました:', error);
             // エラー時は現在の表示を維持
@@ -157,8 +153,8 @@ class WeeklyReportApp {
         
         const stockMapping = {
             0: { ticker: 'N225', name: '日経平均株価' },
-            1: { ticker: 'SPY', name: 'S&P 500 ETF' },
-            2: { ticker: 'RCRUY', name: 'リクルートHD (ADR)' }
+            1: { ticker: 'SPY', name: 'S&P 500' },
+            2: { ticker: 'RECRUIT', name: 'リクルートHD' }
         };
         
         stockCards.forEach((card, index) => {
@@ -167,17 +163,10 @@ class WeeklyReportApp {
             
             const data = stockData[mapping.ticker];
             
-            // 価格表示の計算
+            // 価格表示の計算（全て日本円）
             let priceDisplay, changeDisplay;
-            if (data.currency === 'JPY') {
-                // 日経平均（JPY）
-                priceDisplay = `¥${data.current_price.toLocaleString('ja-JP', {maximumFractionDigits: 0})}`;
-                changeDisplay = `¥${data.change.toLocaleString('ja-JP', {maximumFractionDigits: 0, signDisplay: 'always'})}`;
-            } else {
-                // USD銘柄は円換算値を使用
-                priceDisplay = `¥${data.current_price_jpy.toLocaleString('ja-JP', {maximumFractionDigits: 0})}`;
-                changeDisplay = `¥${data.change_jpy.toLocaleString('ja-JP', {maximumFractionDigits: 0, signDisplay: 'always'})}`;
-            }
+            priceDisplay = `¥${data.current_price.toLocaleString('ja-JP', {maximumFractionDigits: 0})}`;
+            changeDisplay = `¥${data.change.toLocaleString('ja-JP', {maximumFractionDigits: 0, signDisplay: 'always'})}`;
             
             // HTML要素を更新
             const priceElement = card.querySelector('.price-value');
