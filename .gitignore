@@ -1,3 +1,21 @@
+# 週次ビジネスレポートシステム - .gitignore
+# Security & API Keys
+config/settings.json
+enhanced-deepresearch/config/settings.json
+.env
+.env.local
+.env.production
+.env.development
+*.key
+*.secret
+
+# Generated Reports & Cache
+reports/
+cache/
+data/uploads/
+enhanced-deepresearch/data/
+enhanced-deepresearch/cache/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -20,13 +38,21 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
-# Virtual environments
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+
+# Netlify
+.netlify/
+functions-serve/
 
 # IDE
 .vscode/
@@ -45,22 +71,38 @@ ehthumbs.db
 Thumbs.db
 
 # Logs
+logs/
 *.log
 
-# Environment variables
-.env
-.env.local
-.env.production
+# Testing
+.coverage
+.pytest_cache/
+.tox/
 
-# API Keys (if any config files contain them)
-*.key
-secrets/
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # Temporary files
 *.tmp
 *.temp
+temp/
+tmp/
 
-# Confidential data files
+# Backup files
+*.bak
+*.backup
+*~
+
+# Virtual environments
+env.bak/
+venv.bak/
+
+# API Keys (if any config files contain them)
+secrets/
+
+# Revenue files
 Revenue_*.csv
 *revenue*.csv
 *sales*.csv 

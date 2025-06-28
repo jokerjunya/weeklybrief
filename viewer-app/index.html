@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="週次ビジネスレポート - AI駆動の包括的ビジネス分析">
+    <meta name="keywords" content="ビジネスレポート,週次分析,AI,売上データ,株価,ニュース">
+    <meta name="author" content="Junya">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="週次ビジネスレポート">
+    <meta property="og:description" content="AI駆動の包括的ビジネス分析レポート">
+    <meta property="og:url" content="https://weeklyreport.netlify.app">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="週次ビジネスレポート">
+    <meta property="twitter:description" content="AI駆動の包括的ビジネス分析レポート">
+    
+    <title>週次ビジネスレポート | AI駆動分析システム</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./assets/styles.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="./assets/script.js" as="script">
+    <link rel="preload" href="./assets/news-data.json" as="fetch" crossorigin>
+</head>
+<body data-theme="light">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1><i class="fas fa-chart-line"></i> 週次ビジネスレポート</h1>
+                    <div class="header-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span id="currentDate">2025年6月23日</span> 
+                        <span class="report-period">第25週 総合分析レポート</span>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="theme-toggle" id="themeToggle" aria-label="テーマ切り替え">
+                        <i class="fas fa-moon"></i>
+                        <span>ダークモード</span>
+                    </button>
+                    <button class="export-btn" onclick="exportReport()" aria-label="レポートエクスポート">
+                        <i class="fas fa-download"></i>
+                        <span>エクスポート</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Business Metrics Section -->
+            <section class="section" id="metricsSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> ビジネス実績</h2>
+                    <div class="section-subtitle">主要KPIの週次推移と前年同期比較</div>
+                </div>
+                <div class="metrics-grid">
+                    <!-- Placement Metrics -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-title">
+                                <h3>Placement</h3>
+                                <div class="metric-type">内定数実績</div>
+                                <div class="metric-period">2024年4月-6月期</div>
+                            </div>
+                            <div class="metric-icon placement">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">
+                            <span class="value-number">2,739</span>
+                            <span class="value-unit">件</span>
+                            <span class="value-note">(確定分のみ)</span>
+                        </div>
+                        <div class="metric-changes">
+                            <div class="change-item negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>前年同期比: -6.1%</span>
+                            </div>
+                            <div class="change-item positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>前週比: +7.4%</span>
+                            </div>
+                        </div>
+                        <div class="metric-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 68.5%"></div>
+                            </div>
+                            <div class="progress-label">年間目標達成率: 68.5%</div>
+                        </div>
+                        <div class="metric-data-link">
+                            <a href="#" onclick="return false;">
+                                <i class="fas fa-external-link-alt"></i>
+                                詳細データを確認
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Online Platform Metrics -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-title">
+                                <h3>Online Platform</h3>
+                                <div class="metric-type">売上実績</div>
+                                <div class="metric-period">2024年4月-6月期</div>
+                            </div>
+                            <div class="metric-icon online-platform">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">
+                            <span class="value-number">¥1.1</span>
+                            <span class="value-unit">B</span>
+                            <span class="value-note">(前週: ¥10.8B)</span>
+                        </div>
+                        <div class="metric-changes">
+                            <div class="change-item negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>前年同期比: -33.2%</span>
+                            </div>
+                            <div class="change-item negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>前週比: -89.9%</span>
+                            </div>
+                        </div>
+                        <div class="metric-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" style="width: 22%"></div>
+                            </div>
+                            <div class="progress-label">年間目標達成率: 22.0%</div>
+                        </div>
+                        <div class="metric-data-link">
+                            <a href="#" onclick="return false;">
+                                <i class="fas fa-external-link-alt"></i>
+                                詳細データを確認
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stock Information Section -->
+            <section class="section" id="stockSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> 株価情報</h2>
+                    <div class="section-subtitle">主要指数・関連企業の株価動向</div>
+                    <div class="section-actions">
+                        <button class="refresh-btn" id="refreshStockBtn" aria-label="株価データ更新">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>最新データに更新</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="stock-grid">
+                    <div class="stock-card">
+                        <div class="stock-header">
+                            <h3>日経平均株価</h3>
+                            <span class="stock-symbol">N225</span>
+                        </div>
+                        <div class="stock-price">
+                            <div class="price-value">¥38,486</div>
+                            <div class="price-change positive">
+                                <i class="fas fa-caret-up"></i>
+                                <span>+234 (+0.61%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stock-card">
+                        <div class="stock-header">
+                            <h3>S&P 500</h3>
+                            <span class="stock-symbol">SPX</span>
+                        </div>
+                        <div class="stock-price">
+                            <div class="price-value">$5,464</div>
+                            <div class="price-change positive">
+                                <i class="fas fa-caret-up"></i>
+                                <span>+12 (+0.22%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stock-card">
+                        <div class="stock-header">
+                            <h3>リクルートHD</h3>
+                            <span class="stock-symbol">6098.T</span>
+                        </div>
+                        <div class="stock-price">
+                            <div class="price-value">¥1,584</div>
+                            <div class="price-change negative">
+                                <i class="fas fa-caret-down"></i>
+                                <span>-16 (-1.00%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI News Section -->
+            <section class="section news-section" id="newsSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-robot"></i> AI業界ニュース</h2>
+                    <div class="section-subtitle">過去1週間の重要トピック分析</div>
+                </div>
+                
+                <div class="period-info">
+                    <p><strong>対象期間:</strong> 2024年6月16日 - 2024年6月22日</p>
+                    <p><strong>収集記事数:</strong> 15件 | <strong>主要カテゴリ:</strong> OpenAI, Gemini, その他AI技術</p>
+                </div>
+
+                <div class="news-summary">
+                    <h3>📊 週次トレンド分析</h3>
+                    <p>今週は<strong>OpenAI</strong>のChatGPT-4o関連のアップデートが注目を集めた一方、<strong>Google Gemini</strong>の新機能リリースも話題となりました。特に企業向けAIソリューションの競争が激化しており、市場の動向が活発化しています。</p>
+                </div>
+
+                <div class="news-categories">
+                    <button class="category-btn active" data-category="all">
+                        <i class="fas fa-globe"></i>
+                        <span>すべて (15)</span>
+                    </button>
+                    <button class="category-btn" data-category="openai">
+                        <i class="fas fa-robot"></i>
+                        <span>OpenAI (6)</span>
+                    </button>
+                    <button class="category-btn" data-category="gemini">
+                        <i class="fas fa-gem"></i>
+                        <span>Gemini (4)</span>
+                    </button>
+                    <button class="category-btn" data-category="other">
+                        <i class="fas fa-newspaper"></i>
+                        <span>その他 (5)</span>
+                    </button>
+                </div>
+
+                <div class="news-grid" id="newsGrid">
+                    <!-- ニュース項目はJavaScriptで動的に生成されます -->
+                </div>
+            </section>
+
+            <!-- Schedule Section -->
+            <section class="section schedule-section" id="scheduleSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-week"></i> 今週のスケジュール</h2>
+                    <div class="section-subtitle">重要なイベント・予定一覧</div>
+                </div>
+                
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="date-day">24</div>
+                            <div class="date-month">6月</div>
+                            <div class="date-weekday">月</div>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>週次レビューミーティング</h3>
+                            <div class="schedule-time">
+                                <i class="far fa-clock"></i>
+                                <span>10:00 - 11:30</span>
+                            </div>
+                            <div class="schedule-status upcoming">進行中</div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="date-day">26</div>
+                            <div class="date-month">6月</div>
+                            <div class="date-weekday">水</div>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>四半期業績報告</h3>
+                            <div class="schedule-time">
+                                <i class="far fa-clock"></i>
+                                <span>14:00 - 16:00</span>
+                            </div>
+                            <div class="schedule-status important">重要</div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="date-day">28</div>
+                            <div class="date-month">6月</div>
+                            <div class="date-weekday">金</div>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>AI技術勉強会</h3>
+                            <div class="schedule-time">
+                                <i class="far fa-clock"></i>
+                                <span>15:00 - 17:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><strong>週次ビジネスレポート v2.0</strong></p>
+                    <p>最終更新: <span id="lastUpdate">2025年6月23日 11:21</span></p>
+                    <p>データソース: Alpha Vantage, NewsAPI, 内部業績データ</p>
+                </div>
+                <div class="footer-badge">
+                    <span class="badge-label">Powered by</span>
+                    <span class="badge-tech">Enhanced DeepResearch AI</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span class="notification-message"></span>
+        <button class="notification-close" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./assets/script.js"></script>
+    
+    <!-- Initialize App -->
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            window.reportApp = new WeeklyReportApp();
+            window.reportApp.init();
+        });
+        
+        // Update current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Update last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    </script>
+</body>
+</html> 

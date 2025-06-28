@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="週次ビジネスレポート管理者画面 - データ管理とレポート生成">
+    <meta name="author" content="Junya">
+    
+    <title>週次レポート管理画面 | Admin Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./assets/admin.css">
+</head>
+<body data-theme="light">
+    <!-- Main Dashboard Layout -->
+    <div class="admin-dashboard">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-chart-line"></i> 管理画面</h1>
+                <p class="sidebar-subtitle">v2.0 Enhanced</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#dashboard" class="nav-link" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>ダッシュボード</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#sales-upload" class="nav-link" data-section="sales-upload">
+                            <i class="fas fa-upload"></i>
+                            <span>売上データ</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#news-manage" class="nav-link" data-section="news-manage">
+                            <i class="fas fa-newspaper"></i>
+                            <span>ニュース管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#events-edit" class="nav-link" data-section="events-edit">
+                            <i class="fas fa-calendar-edit"></i>
+                            <span>イベント編集</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#report-generate" class="nav-link" data-section="report-generate">
+                            <i class="fas fa-file-alt"></i>
+                            <span>レポート生成</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>管理者</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-content">
+                    <h2 class="page-title">ダッシュボード</h2>
+                    <div class="header-actions">
+                        <div class="status-indicator">
+                            <i class="fas fa-circle text-success"></i>
+                            <span>システム正常</span>
+                        </div>
+                        <div class="last-update">
+                            最終更新: <span id="lastUpdateTime">2025年6月23日 11:21</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> 最新データ状況</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-label">売上データ</div>
+                                    <div class="stat-value success">最新</div>
+                                    <div class="stat-time">6月23日 10:30</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">ニュース分析</div>
+                                    <div class="stat-value warning">要更新</div>
+                                    <div class="stat-time">6月22日 18:00</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">株価データ</div>
+                                    <div class="stat-value success">最新</div>
+                                    <div class="stat-time">リアルタイム</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tasks"></i> 今日のタスク</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="task-list">
+                                <div class="task-item">
+                                    <i class="fas fa-upload text-primary"></i>
+                                    <span>売上データをアップロード</span>
+                                    <div class="task-status pending">待機中</div>
+                                </div>
+                                <div class="task-item">
+                                    <i class="fas fa-eye text-info"></i>
+                                    <span>ニュース記事を査読</span>
+                                    <div class="task-status pending">待機中</div>
+                                </div>
+                                <div class="task-item completed">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>週次レポート公開</span>
+                                    <div class="task-status complete">完了</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-brain"></i> Enhanced DeepResearch</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="deepresearch-status">
+                                <div class="status-item">
+                                    <i class="fas fa-robot"></i>
+                                    <div>
+                                        <div class="status-label">Qwen3 エンジン</div>
+                                        <div class="status-value">稼働中</div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <i class="fas fa-search"></i>
+                                    <div>
+                                        <div class="status-label">情報収集</div>
+                                        <div class="status-value">実行中 (15件)</div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <i class="fas fa-cogs"></i>
+                                    <div>
+                                        <div class="status-label">分析処理</div>
+                                        <div class="status-value">待機中</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sales Upload Section -->
+            <section id="sales-upload" class="content-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-upload"></i> 売上データアップロード</h3>
+                    <p class="section-description">CSVファイルをアップロードして売上データを更新します</p>
+                </div>
+                
+                <div class="upload-area">
+                    <form id="salesUploadForm" enctype="multipart/form-data">
+                        <div class="file-drop-zone" id="fileDropZone">
+                            <div class="drop-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="drop-text">
+                                <p><strong>CSVファイルをドラッグ&ドロップ</strong></p>
+                                <p>または</p>
+                            </div>
+                            <input type="file" id="salesFile" accept=".csv" class="file-input">
+                            <button type="button" class="file-select-btn" onclick="document.getElementById('salesFile').click()">
+                                <i class="fas fa-folder-open"></i>
+                                ファイルを選択
+                            </button>
+                        </div>
+                        
+                        <div class="upload-controls">
+                            <button type="submit" class="btn btn-primary" disabled>
+                                <i class="fas fa-upload"></i>
+                                アップロード & 解析
+                            </button>
+                            <div class="upload-status">
+                                <span id="uploadStatus">ファイルを選択してください</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="upload-history">
+                    <h4>アップロード履歴</h4>
+                    <div class="history-list">
+                        <div class="history-item">
+                            <div class="history-info">
+                                <div class="file-name">weekly_sales_report_20250623.csv</div>
+                                <div class="file-meta">2025年6月23日 10:30 | 2,739件のデータ</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i> 詳細
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- News Management Section -->
+            <section id="news-manage" class="content-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-newspaper"></i> ニュース管理</h3>
+                    <p class="section-description">AI分析されたニュースの査読と優先度設定を行います</p>
+                </div>
+
+                <div class="news-controls">
+                    <button class="btn btn-primary" id="analyzeNewsBtn">
+                        <i class="fas fa-brain"></i>
+                        DeepResearch 実行
+                    </button>
+                    <div class="filter-controls">
+                        <select id="newsFilter" class="form-select">
+                            <option value="all">すべて</option>
+                            <option value="pending">査読待ち</option>
+                            <option value="approved">承認済み</option>
+                            <option value="rejected">非表示</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="news-review-panel">
+                    <div class="review-item">
+                        <div class="news-header">
+                            <div class="news-meta">
+                                <span class="category-tag openai">OpenAI</span>
+                                <span class="analysis-score">重要度: 8.5</span>
+                            </div>
+                            <div class="news-actions">
+                                <button class="btn btn-sm btn-success">承認</button>
+                                <button class="btn btn-sm btn-danger">非表示</button>
+                            </div>
+                        </div>
+                        <div class="news-content">
+                            <h4 class="news-title">ChatGPT-4o の新機能リリース</h4>
+                            <p class="news-summary">OpenAIがChatGPT-4oの重要なアップデートを発表...</p>
+                            <div class="priority-control">
+                                <label>表示優先度:</label>
+                                <input type="range" min="0" max="10" value="8" class="priority-slider">
+                                <span class="priority-value">8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Edit Section -->
+            <section id="events-edit" class="content-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-edit"></i> イベント編集</h3>
+                    <p class="section-description">今週のスケジュールとイベントを編集します</p>
+                </div>
+
+                <div class="events-editor">
+                    <div class="event-form">
+                        <div class="form-group">
+                            <label for="eventDate">日時</label>
+                            <input type="datetime-local" id="eventDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="eventTitle">イベントタイトル</label>
+                            <input type="text" id="eventTitle" class="form-input" placeholder="イベントタイトル">
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDescription">説明</label>
+                            <textarea id="eventDescription" class="form-textarea" placeholder="イベントの詳細..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventStatus">ステータス</label>
+                            <select id="eventStatus" class="form-select">
+                                <option value="upcoming">予定</option>
+                                <option value="important">重要</option>
+                                <option value="ongoing">進行中</option>
+                                <option value="completed">完了</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            イベントを追加
+                        </button>
+                    </div>
+
+                    <div class="events-list">
+                        <h4>今週のイベント</h4>
+                        <div class="event-items">
+                            <!-- イベント項目はJavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Report Generate Section -->
+            <section id="report-generate" class="content-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-file-alt"></i> レポート生成</h3>
+                    <p class="section-description">週次レポートの生成・プレビュー・公開を行います</p>
+                </div>
+
+                <div class="report-controls">
+                    <div class="control-group">
+                        <button class="btn btn-primary btn-lg" id="generateReportBtn">
+                            <i class="fas fa-cogs"></i>
+                            レポート生成
+                        </button>
+                        <button class="btn btn-outline btn-lg" id="previewReportBtn">
+                            <i class="fas fa-eye"></i>
+                            プレビュー
+                        </button>
+                    </div>
+                    
+                    <div class="publish-section">
+                        <div class="publish-info">
+                            <h4>公開設定</h4>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="autoPublish" checked>
+                                    閲覧者サイトに自動公開
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="notifyUsers">
+                                    ユーザーに通知を送信
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-success btn-lg" id="publishReportBtn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                            レポート公開
+                        </button>
+                    </div>
+                </div>
+
+                <div class="generation-status">
+                    <div class="status-bar">
+                        <div class="status-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="status-text">待機中</div>
+                </div>
+
+                <div class="report-preview" id="reportPreview" style="display: none;">
+                    <h4>プレビュー</h4>
+                    <div class="preview-content">
+                        <!-- プレビュー内容はJavaScriptで生成 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./assets/admin.js"></script>
+    <script src="./assets/api-test.js"></script>
+    <script src="./assets/integration-test.js"></script>
+    
+    <!-- Initialize Admin App -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.adminApp = new AdminReportManager();
+            window.adminApp.init();
+        });
+        
+        // Update last update time
+        document.getElementById('lastUpdateTime').textContent = new Date().toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    </script>
+</body>
+</html> 

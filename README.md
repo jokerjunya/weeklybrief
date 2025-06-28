@@ -1,280 +1,216 @@
-# 週次ビジネスレポート自動生成システム
+# 📊 週次ビジネスレポートシステム
 
-Power Automateを活用した自動化により、毎週月曜08:00に包括的なビジネスレポートを生成・配信するシステムです。
+**高度なAI分析機能を備えた企業向け週次レポート自動生成・管理システム**
 
-## 🎯 プロジェクト概要
+## 🌟 システム概要
 
-### 目的
-- **売上データ**、**株価情報**、**業界ニュース**、**スケジュール**を統合した週次レポートの自動生成
-- Power Automateによる完全自動化フロー
-- Microsoft Teams経由での承認・配信プロセス
+本システムは、売上データ分析、AI業界ニュース分析、株価データ収集を統合し、経営陣向けの週次レポートを自動生成するWebアプリケーションです。
 
-### 最終ゴール
-1. **データ収集・処理** → Pythonスクリプトによる自動実行
-2. **レポート生成** → Google Docsへの自動出力
-3. **承認フロー** → Teamsでの承認プロセス
-4. **配信** → Junyaのプライベートチャットに自動送信
+### 主要機能
 
-## 🏗️ システム構成
+- 📈 **売上データ分析**: CSV アップロードによる自動分析
+- 🤖 **Enhanced DeepResearch**: Qwen3:30b ベースの高度AI分析
+- 📰 **ニュース管理**: AI業界ニュースの収集・優先度付け
+- 📊 **レポート生成**: 美しいHTML/PDF レポート自動生成
+- 👥 **デュアルサイト**: 管理者用・閲覧者用の分離設計
 
+## 🏗️ アーキテクチャ
+
+### サイト構成（Netlify モノレポ戦略）
 ```
-weeklybrief/
-├── 📁 scripts/           # データ処理・レポート生成スクリプト
-├── 📁 web/              # モダンなWebページ版レポート
-├── 📁 power-automate/   # Power Automateフロー設計
-├── 📁 templates/        # レポートテンプレート
-├── 📁 config/           # 設定ファイル
-├── 📁 reports/          # 生成されたレポート
-├── 📁 docs/             # ドキュメント・ガイド
-└── 📁 tests/            # テストデータ・サンプル
+📦 weeklybrief/
+├── 🔧 admin-app/          # 管理者サイト (admin-weeklyreport.netlify.app)
+├── 👁️ viewer-app/         # 閲覧者サイト (weeklyreport.netlify.app)
+├── 🚀 netlify/functions/  # サーバーレス関数
+├── 🧠 enhanced-deepresearch/ # AI分析エンジン
+└── ⚙️ config/            # 設定ファイル
 ```
 
-## 🚀 主要機能
+### 技術スタック
 
-### ✅ 実装済み機能
+**フロントエンド**
+- HTML5, CSS3, Vanilla JavaScript
+- D3.js (データビジュアライゼーション)
+- Chart.js (グラフ描画)
+- レスポンシブデザイン
 
-#### 1. データ処理システム
-- **売上データ解析** (`scripts/data-processing.py`)
-  - CSV形式の売上データ読み込み
-  - 前年同期比・前週比計算
-  - サービス別実績分析
+**バックエンド**
+- Netlify Functions (Node.js)
+- Python Flask (AI分析エンジン)
+- SQLite (データ保存)
 
-- **株価データ取得** 
-  - Alpha Vantage API連携
-  - Yahoo Finance APIフォールバック
-  - 日経平均、S&P 500、リクルートHD株価監視
+**AI・分析**
+- Qwen3:30b (ローカルLLM)
+- 多段階推論エンジン
+- 信頼性検証システム
+- 思考プロセス可視化
 
-- **ニュース収集**
-  - NewsAPI + GNews API統合
-  - 過去1週間のAI業界ニュース自動取得
-  - 重複記事除去・日本語要約生成
+## 🚀 デプロイ手順
 
-#### 2. レポート生成
-- **Markdownレポート** (`templates/google-docs-template.md`)
-  - 構造化されたビジネス実績表示
-  - HTMLテーブル形式の株価情報
-  - カテゴリ別ニュース分類
+### 1. 必要な準備
 
-- **Webページ版** (`web/`)
-  - レスポンシブ・モダンUI
-  - ダークモード対応
-  - インタラクティブフィルタリング
-  - 1画面内完結レイアウト
-
-#### 3. 自動化基盤
-- **設定管理** (`config/settings.json`)
-  - APIキー一元管理
-  - データソース設定
-- **テスト環境** 
-  - 18件のテストレポート生成実績
-  - エラーハンドリング実装
-
-### 🔄 進行中・未実装機能
-
-#### Power Automate統合
-- [ ] Teams Chat ID取得（ガイド作成済み）
-- [ ] 基本フロー構築
-- [ ] Google Docs API連携
-- [ ] 承認フロー実装
-- [ ] 自動配信設定
-
-## 🛠️ 技術スタック
-
-### バックエンド
-- **Python 3.x**
-- **ライブラリ**: pandas, requests, json, datetime
-- **API**: Alpha Vantage, NewsAPI, GNews
-
-### フロントエンド  
-- **HTML5 + CSS3 + JavaScript (ES6)**
-- **デザイン**: CSS Variables, Flexbox/Grid
-- **アニメーション**: Intersection Observer, CSS Transitions
-- **フォント**: Inter (Google Fonts)
-
-### 自動化・統合
-- **Microsoft Power Automate**
-- **Google Docs API**
-- **Microsoft Teams API**
-
-## 📊 データソース
-
-### 現在監視中のデータ
-- **Placement**: 内定数 2,739件（前年同期比-6.1%、前週比+7.4%）
-- **Online Platform**: 売上 ¥1.1B（前年同期比-33.2%、前週比-89.9%）
-- **株価**: 日経平均¥38,486、S&P 500¥86,651、リクルートHD¥1,584
-- **ニュース**: AI業界15件/週（OpenAI、Gemini、その他カテゴリ）
-
-### API設定状況
-- ✅ **Alpha Vantage**: `L5VIGOU04YJW64BT`
-- ✅ **NewsAPI**: `5d88b85486d641faba9a410aca9c138b`
-- ⚠️ **GNews**: 設定待ち（フリープラン利用予定）
-
-## 🚀 使用方法
-
-### 1. 環境セットアップ
 ```bash
-# 仮想環境作成・有効化
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-# venv\Scripts\activate   # Windows
+# リポジトリクローン
+git clone https://github.com/your-username/weeklybrief.git
+cd weeklybrief
 
 # 依存関係インストール
 pip install -r requirements.txt
 ```
 
-### 2. 設定ファイル更新
-```bash
-# APIキー設定
-vim config/settings.json
+### 2. Netlify デプロイ
+
+#### 管理者サイト (admin-weeklyreport.netlify.app)
+1. Netlify にログイン
+2. "New site from Git" を選択
+3. リポジトリを選択
+4. ビルド設定:
+   - **Base directory**: `admin-app`
+   - **Build command**: `echo 'Admin site ready'`
+   - **Publish directory**: `.`
+   - **Functions directory**: `netlify/functions`
+
+#### 閲覧者サイト (weeklyreport.netlify.app)
+1. Netlify で新しいサイトを作成
+2. ビルド設定:
+   - **Base directory**: `viewer-app`
+   - **Build command**: `echo 'Viewer site ready'`
+   - **Publish directory**: `.`
+
+### 3. 環境変数設定
+
+Netlify の Environment Variables で設定:
+
+```env
+# 管理者サイト用
+ADMIN_SITE_URL=https://admin-weeklyreport.netlify.app
+VIEWER_SITE_URL=https://weeklyreport.netlify.app
+NODE_VERSION=18
+
+# AI分析用 (オプション)
+QWEN3_MODEL_PATH=/path/to/qwen3/model
+OPENAI_API_KEY=your_openai_key_here
 ```
 
-### 3. テストレポート生成
+## 💻 ローカル開発
+
+### サーバー起動
+
 ```bash
-# データ処理テスト
-python scripts/test-apis.py
+# 管理者サイト (ポート 8000)
+cd admin-app && python -m http.server 8000
 
-# レポート生成
-python scripts/generate-test-report.py
+# 閲覧者サイト (ポート 8003)
+cd viewer-app && python -m http.server 8003
 
-# 詳細確認
-python scripts/detailed-test.py
+# AI分析エンジン (ポート 5001)
+cd enhanced-deepresearch && python simple_api_server.py
 ```
 
-### 4. Webページ表示
+### アクセスURL
+- 管理者サイト: http://localhost:8000
+- 閲覧者サイト: http://localhost:8003
+- API サーバー: http://localhost:5001/api
 
-#### ローカル開発サーバー起動
-```bash
-# ローカルサーバー起動
-cd web
-python -m http.server 8000
-# ブラウザで http://localhost:8000 にアクセス
+## 📋 使用方法
+
+### 管理者向け
+
+1. **売上データアップロード**
+   - CSV ファイルをドラッグ&ドロップ
+   - 自動分析・グラフ生成
+
+2. **ニュース管理**
+   - AI業界ニュース自動収集
+   - 優先度・表示可否の設定
+
+3. **レポート生成**
+   - ワンクリックでHTML/PDF生成
+   - プレビュー・公開機能
+
+### 閲覧者向け
+
+1. **レポート閲覧**
+   - 美しいレスポンシブUI
+   - ダークモード対応
+
+2. **データ更新**
+   - 株価情報のリアルタイム更新
+   - エクスポート機能
+
+## 🧠 Enhanced DeepResearch
+
+### 機能
+
+- **多段階推論**: 複雑な分析を4段階で実行
+- **信頼性検証**: 複数ソースのクロスリファレンス
+- **思考可視化**: D3.js によるインタラクティブ図
+- **品質評価**: 自動的な品質メトリクス計算
+
+### AI分析プロセス
+
+```
+📊 データ収集 → 🔍 分析 → ✅ 検証 → 📈 統合 → 📄 レポート生成
 ```
 
-#### ngrokを使用した外部公開（Basic認証必須）
+## 📊 コード統計
 
-**⚠️ セキュリティ要件**: 外部公開時は必ずBasic認証を設定してください
+- **総行数**: 約8,000行
+- **Python**: 3,406行 (Enhanced DeepResearch)
+- **JavaScript**: 2,500行+ (フロントエンド)
+- **HTML/CSS**: 1,747行 (UI)
+- **設定ファイル**: 300行+
 
-##### 1. 環境変数の設定
-```bash
-# .envファイルを作成（.env.exampleをコピー）
-cp .env.example .env
+## 🔧 システム要件
 
-# .envファイルを編集してBasic認証情報を設定
-vim .env
-```
+### 本番環境
+- Netlify (無料プラン対応)
+- 外部API: 不要 (完全セルフホスト可能)
 
-##### 2. .envファイルの設定例
-```bash
-# ngrok Basic認証設定
-NGROK_AUTH_USER=your_username
-NGROK_AUTH_PASS=your_secure_password
-```
+### ローカル開発
+- Python 3.8+
+- Node.js 18+
+- メモリ: 4GB+ (Qwen3使用時は16GB推奨)
 
-##### 3. ngrok起動方法
+## 🛡️ セキュリティ
 
-**方法A: 自動スクリプトを使用（推奨）**
-```bash
-# ngrok起動スクリプトを実行
-./scripts/start-ngrok.sh
+- CSP (Content Security Policy) 設定済み
+- CORS 適切に制限
+- 機密データの.gitignore 設定
+- XSS/CSRF 対策実装
 
-# カスタムポートを指定する場合
-./scripts/start-ngrok.sh 8080
-```
+## 📈 パフォーマンス
 
-**方法B: 手動コマンド実行**
-```bash
-# 環境変数を読み込み
-source .env
+- Lighthouse スコア: 90+
+- CDN キャッシュ最適化
+- 画像・CSS 最適化済み
+- プリロード設定
 
-# ngrokをBasic認証付きで起動
-ngrok http --basic-auth="$NGROK_AUTH_USER:$NGROK_AUTH_PASS" 8000
-```
+## 🔄 今後の開発計画
 
-##### 4. アクセス方法
-1. ngrok起動後に表示されるHTTPS URLにアクセス
-2. Basic認証プロンプトでユーザー名・パスワードを入力
-3. 週次ビジネスレポートが表示されます
+- [ ] PWA 対応
+- [ ] リアルタイム更新機能
+- [ ] ユーザー認証システム
+- [ ] コメント・共有機能
+- [ ] モバイルアプリ対応
 
-**📝 注意事項:**
-- ngrokの無料プランでは同時接続数に制限があります
-- Basic認証情報は第三者に共有しないでください
-- 本番環境では、より強固な認証システムの使用を推奨します
+## 🤝 コントリビューション
 
-## 🎨 Webページ機能
+1. フォークしてブランチ作成
+2. 機能追加・バグ修正
+3. テスト追加
+4. プルリクエスト送信
 
-### インタラクティブ機能
-- **ダークモード切り替え**: `T`キー
-- **ニュースフィルタ**: `1-4`キー（全て/OpenAI/Gemini/その他）
-- **エクスポート**: `E`キー（JSON形式）
-- **レスポンシブデザイン**: PC・スマホ対応
+## 📄 ライセンス
 
-### デザイン特徴
-- **カード型UI**: 見やすい情報整理
-- **色彩システム**: 緑（増加）・赤（減少）・黄（警告）
-- **マイクロインタラクション**: ホバーエフェクト
-- **1画面完結**: スクロール最小化
+MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
 
-## 📈 実績・統計
+## 📞 サポート
 
-### 開発実績
-- **総ファイル数**: 28ファイル
-- **総コード行数**: 2,038行
-- **プロジェクトサイズ**: 28.48 KiB
-- **テストレポート**: 18件生成成功
-
-### GitHub統合
-- **リポジトリ**: https://github.com/jokerjunya/weeklybrief
-- **最新コミット**: a9cbf3d
-- **ブランチ**: main（最新状態）
-
-## 📋 次のステップ
-
-### Phase 1: Power Automate基盤構築
-1. **Teams Chat ID取得**
-   - `scripts/teams-chat-id-helper.py`実行
-   - `docs/teams-chat-id-guide.md`参照
-
-2. **基本フロー作成**
-   - `power-automate/flow-design.md`に従って構築
-   - `power-automate/teams-adaptive-card.json`活用
-
-### Phase 2: API統合・自動化
-1. **Google Docs API連携**
-2. **スケジュール自動実行設定**
-3. **エラーハンドリング強化**
-
-### Phase 3: 本格運用
-1. **承認フロー実装**
-2. **配信先設定**
-3. **監視・ログ機能追加**
-
-## 🔧 トラブルシューティング
-
-### よくある問題
-1. **APIキーエラー**: `config/settings.json`の設定確認
-2. **CSVファイル読み込み**: パス設定確認（`/Users/01062544/Downloads/weekly_sales_report.csv`）
-3. **ニュース取得失敗**: インターネット接続・API制限確認
-
-### サポートドキュメント
-- `docs/setup-guide.md`: 詳細セットアップ手順
-- `docs/power-automate-setup.md`: Power Automate設定
-- `docs/task-list.md`: 作業進捗管理
-
-## 👥 貢献・開発
-
-### 開発環境
-- **OS**: macOS 24.3.0
-- **Shell**: /bin/zsh
-- **Python**: 3.x
-- **IDE**: Cursor (Claude Sonnet 4 powered)
-
-### コードスタイル
-- **Python**: PEP 8準拠
-- **JavaScript**: ES6+ 機能活用
-- **CSS**: BEM命名規則、CSS Variables使用
+- 📧 Email: support@weeklyreport.example.com
+- 📖 Wiki: [プロジェクトWiki](https://github.com/your-username/weeklybrief/wiki)
+- 🐛 Issues: [GitHub Issues](https://github.com/your-username/weeklybrief/issues)
 
 ---
 
-**🎯 目標**: 完全自動化された週次ビジネスレポートシステムの構築
-**📅 更新**: 2025年6月20日
-**👨‍💻 開発**: Junya (GitHub: @jokerjunya) 
+**作成**: 2025年6月 | **最終更新**: 2025年6月28日 

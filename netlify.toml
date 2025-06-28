@@ -1,0 +1,83 @@
+# 週次ビジネスレポートシステム - Netlify設定 (管理者サイト)
+[build]
+  base = "admin-app"
+  publish = "."
+  command = "echo 'Admin site ready for deployment'"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+# API Functions ルーティング
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+
+# セキュリティヘッダー (管理者サイト用)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://admin-weeklyreport.netlify.app"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# 管理者認証用設定
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# CSP (Content Security Policy)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://d3js.org https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://admin-weeklyreport.netlify.app;
+    """
+
+# エラーページ
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404
+
+[context.production.environment]
+  ADMIN_SITE_URL = "https://admin-weeklyreport.netlify.app"
+  VIEWER_SITE_URL = "https://weeklyreport.netlify.app"
+
+# Basic authentication for admin site (optional)
+[context.production]
+  command = "npm run build:prod"
+
+# Development settings
+[context.dev]
+  command = "npm run dev" 

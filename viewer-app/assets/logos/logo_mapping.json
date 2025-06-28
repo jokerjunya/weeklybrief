@@ -1,0 +1,67 @@
+{
+  "openai": {
+    "path": "logos/openai_fallback.svg",
+    "name": "OpenAI",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "google": {
+    "path": "logos/google.png",
+    "name": "Google",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "microsoft": {
+    "path": "logos/microsoft.png",
+    "name": "Microsoft",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "meta": {
+    "path": "logos/meta_fallback.svg",
+    "name": "Meta",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "nvidia": {
+    "path": "logos/nvidia.svg",
+    "name": "NVIDIA",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "apple": {
+    "path": "logos/apple.png",
+    "name": "Apple",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "amazon": {
+    "path": "logos/amazon_fallback.svg",
+    "name": "Amazon/AWS",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "tesla": {
+    "path": "logos/tesla_fallback.svg",
+    "name": "Tesla",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "spacex": {
+    "path": "logos/spacex.jpg",
+    "name": "SpaceX",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "polar": {
+    "path": "logos/polar.png",
+    "name": "Polar",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "netflix": {
+    "path": "logos/netflix.png",
+    "name": "Netflix",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "gemini": {
+    "path": "logos/gemini.svg",
+    "name": "Gemini",
+    "downloaded_at": "2025-06-20 18:29:06"
+  },
+  "other": {
+    "path": "logos/other.png",
+    "name": "その他",
+    "downloaded_at": "2025-06-20 18:29:06"
+  }
+}

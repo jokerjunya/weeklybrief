@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "generated_at": "2025-06-23T12:10:54.320961",
+    "data_period": "2025年06月23日",
+    "version": "1.0"
+  },
+  "businessData": {
+    "services": [
+      {
+        "name": "Placement",
+        "metricType": "内定数",
+        "period": "2025/06/09-2025/06/13",
+        "currentValue": 2739,
+        "yoyChange": -6.1,
+        "weeklyChange": 7.4,
+        "yoyNote": "",
+        "displayValue": "2,739件"
+      },
+      {
+        "name": "Online Platform",
+        "metricType": "売上",
+        "period": "2025/06/15-2025/06/22",
+        "currentValue": 3772444054,
+        "yoyChange": 53.9,
+        "weeklyChange": -3.6,
+        "yoyNote": " ※昨年のPPCと比較",
+        "displayValue": "37億7,244万円 ※グロスレベニュー"
+      }
+    ]
+  },
+  "stockData": {
+    "N225": {
+      "current_price": 38175.63,
+      "change": -85.06,
+      "change_percent": -0.22,
+      "currency": "JPY",
+      "status": "success"
+    },
+    "SPY": {
+      "current_price": 5968.34,
+      "change": -31.33,
+      "change_percent": -0.52,
+      "currency": "JPY",
+      "status": "success"
+    },
+    "RECRUIT": {
+      "current_price": 7782.0,
+      "change": 92.0,
+      "change_percent": 1.2,
+      "currency": "JPY",
+      "status": "success"
+    }
+  },
+  "newsData": {
+    "summary": "今週のAI・テクノロジーニュースでは、精度向上と実用化が主なトレンド。主要企業の技術革新が続いており、ビジネス応用の加速が期待される。",
+    "articles": [
+      {
+        "title": "Apple、AI検索新興企業Perplexityの買収を社内で協議 - 米報道",
+        "summary_jp": "AppleがAI人材獲得を目指し、企業価値140億ドル（約2兆500億円）のPerplexity AIの買収について社内で協議していることが明らかになった。実現すればApple史上最大の買収案件となる可能性がある。",
+        "url": "https://www.bloomberg.co.jp/news/articles/2025-06-21/SY6TLEDWLU6800",
+        "published_at": "2025-06-21",
+        "company": "apple",
+        "score": 5.5,
+        "source": "Bloomberg"
+      },
+      {
+        "title": "Perplexity AI、企業価値2兆円で資金調達完了",
+        "summary_jp": "AI検索エンジンのPerplexity AIが140億ドル（約2兆500億円）の企業価値で資金調達ラウンドを完了。AppleやMetaなど大手テック企業からの買収関心が高まっている。",
+        "url": "https://www.nikkei.com/article/DGXZQOGN2107X0R20C25A6000000/",
+        "published_at": "2025-06-21",
+        "company": "perplexity",
+        "score": 5.3,
+        "source": "日経新聞"
+      },
+      {
+        "title": "OpenAI removes ‘io’ branding mentions over trademark lawsuit",
+        "summary_jp": "OpenAI says the content was taken offline following a court order tied to a startup spun out of Google’s moonshot factory....",
+        "url": "https://9to5mac.com/2025/06/22/openai-an-jony-ive-remove-io-branding-mentions-trademark-lawsuit/",
+        "published_at": "2025-06-22",
+        "company": "openai",
+        "score": 5.0,
+        "source": "GNews"
+      },
+      {
+        "title": "ChatGPT：生物兵器のリスクは現実的",
+        "summary_jp": "OpenAI 警告した that ChatGPT 知ることになる 作り方を 生物兵器 and 説明した what it’s doing to 防ぐため it from 支援する 悪意のある行為者....",
+        "url": "https://bgr.com/tech/heres-why-chatgpt-needs-to-know-how-to-make-bioweapons/",
+        "published_at": "2025-06-20",
+        "company": "openai",
+        "score": 5.3,
+        "source": "GNews"
+      },
+      {
+        "title": "Anthropic研究：主要AIモデルが経営陣に対して最大96%の脅迫率を示す",
+        "summary_jp": "Anthropic 研究により明らかになった AIモデル from OpenAI, Google, Meta and others 選択した 脅迫, 企業スパイ活動 and 致命的な行為 when シャットダウンに直面して or 相反する目標....",
+        "url": "https://venturebeat.com/ai/anthropic-study-leading-ai-models-show-up-to-96-blackmail-rate-against-executives/",
+        "published_at": "2025-06-20",
+        "company": "anthropic",
+        "score": 5.0,
+        "source": "GNews"
+      },
+      {
+        "title": "Want to write a book? This specialized AI makes it easy.",
+        "summary_jp": "Tap into popular AIモデル like ChatGPT and Claude with Youbooks, a new AI book writer that helps you pull together full nonfiction books....",
+        "url": "https://www.cultofmac.com/deals/youbooks-ai-book-writer-deal",
+        "published_at": "2025-06-22",
+        "company": "chatgpt",
+        "score": 5.3,
+        "source": "GNews"
+      },
+      {
+        "title": "ChatGPT：生物兵器のリスクは現実的",
+        "summary_jp": "OpenAI 警告した that ChatGPT 知ることになる 作り方を 生物兵器 and 説明した what it’s doing to 防ぐため it from 支援する 悪意のある行為者....",
+        "url": "https://bgr.com/tech/heres-why-chatgpt-needs-to-know-how-to-make-bioweapons/",
+        "published_at": "2025-06-20",
+        "company": "openai",
+        "score": 5.0,
+        "source": "GNews"
+      },
+      {
+        "title": "ChatGPTがリマインダーとToDoリストの送信に対応 - 最大の生産性を得るためのプロンプト活用法",
+        "summary_jp": "A 新しい方法 to use ChatGPT for 求める人のための より多くの 生産性....",
+        "url": "https://www.tomsguide.com/ai/chatgpt-can-send-reminders-and-set-to-do-lists-use-these-four-prompts-for-maximum-productivity",
+        "published_at": "2025-06-19",
+        "company": "openai",
+        "score": 5.3,
+        "source": "GNews"
+      }
+    ]
+  },
+  "scheduleData": [
+    {
+      "date": "2025-06-24",
+      "time": "09:00",
+      "title": "JP HR Steering Committee",
+      "weekday": "火"
+    },
+    {
+      "date": "2025-06-26",
+      "time": "10:00",
+      "title": "株主総会オンサイト",
+      "weekday": "木"
+    },
+    {
+      "date": "2025-06-27",
+      "time": "14:00",
+      "title": "Bi-weekly SLT Meeting",
+      "weekday": "金"
+    }
+  ]
+}

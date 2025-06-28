@@ -1,0 +1,74 @@
+# 週次ビジネスレポートシステム - 閲覧者サイト設定
+[build]
+  base = "."
+  publish = "."
+  command = "echo 'Viewer site ready for deployment'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# PWA対応
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# パフォーマンス最適化ヘッダー
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/assets/logos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# SEO最適化
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://weeklyreport.netlify.app;
+    """
+
+# API接続設定（管理者サイトのFunctionsを利用）
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://weeklyreport.netlify.app"
+    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+
+# プリロード設定
+[[headers]]
+  for = "/"
+  [headers.values]
+    Link = """
+      </assets/styles.css>; rel=preload; as=style,
+      </assets/script.js>; rel=preload; as=script,
+      <https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap>; rel=preload; as=style
+    """ 

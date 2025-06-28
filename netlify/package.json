@@ -1,0 +1,37 @@
+{
+  "name": "weeklyreport-netlify-functions",
+  "version": "2.0.0",
+  "description": "Enhanced DeepResearch 統合 週次レポートシステム Netlify Functions",
+  "main": "functions/deepresearch-api.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Building Netlify Functions...'",
+    "test": "echo 'Testing Netlify Functions...'"
+  },
+  "dependencies": {
+    "formidable": "^3.5.1",
+    "csv-parser": "^3.0.0",
+    "multipart-parser": "^0.2.2"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-repo/weeklyreport-system"
+  },
+  "keywords": [
+    "netlify",
+    "functions",
+    "ai",
+    "deepresearch",
+    "report-generation",
+    "csv-processing",
+    "news-analysis"
+  ],
+  "author": "Enhanced DeepResearch Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
