@@ -1,0 +1,2 @@
+Admin Site Deploy Trigger - 2025-06-28 15:14
+Force rebuild to fix AdminReportManager initialization issue 
