@@ -12,7 +12,7 @@ const isAdminSite = window.location.hostname.includes('admin') || window.locatio
 const config = {
   // 開発環境
   development: {
-    apiUrl: 'http://127.0.0.1:5001/api',
+    apiUrl: 'http://127.0.0.1:6001/api',
     adminSiteUrl: 'http://localhost:8000',
     viewerSiteUrl: 'http://localhost:8003',
     debug: true,
