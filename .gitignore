@@ -105,4 +105,9 @@ secrets/
 # Revenue files
 Revenue_*.csv
 *revenue*.csv
-*sales*.csv 
+*sales*.csv
+
+# Generated web reports (動的生成されるレポートファイル)
+web/*_web_*.html
+web/週次レポート_*.html
+web/PresidentOffice_Weekly_Brief_*.html 

@@ -19,6 +19,14 @@ class IntegrationTestSuite {
     }
     
     addTestInterface() {
+        // 既存のテストパネルが存在するかチェック
+        const existingPanel = document.getElementById('integration-test-panel');
+        if (existingPanel) {
+            console.log('🧪 既存のテストパネルを使用');
+            return; // 既にパネルが存在する場合は何もしない
+        }
+        
+        // 存在しない場合のみ新規作成（フォールバック）
         const testContainer = document.createElement('div');
         testContainer.id = 'integration-test-panel';
         testContainer.innerHTML = `
@@ -43,7 +51,7 @@ class IntegrationTestSuite {
         `;
         
         // テストパネルをサイドバーに追加
-        const sidebar = document.querySelector('.sidebar');
+        const sidebar = document.querySelector('.admin-sidebar');
         if (sidebar) {
             sidebar.appendChild(testContainer);
         }
@@ -514,4 +522,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🧪 統合テストスイート準備完了');
 });
 
-export default IntegrationTestSuite; 
+// ブラウザ環境での使用のため、export文をコメントアウト
+// export default IntegrationTestSuite; 

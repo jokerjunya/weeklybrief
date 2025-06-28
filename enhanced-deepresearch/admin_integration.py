@@ -375,6 +375,14 @@ def get_analysis_visualization(analysis_id):
         return jsonify({"error": f"可視化データ取得エラー: {str(e)}"}), 500
 
 if __name__ == '__main__':
+    import argparse
+    
+    # コマンドライン引数処理
+    parser = argparse.ArgumentParser(description='Enhanced DeepResearch API Server')
+    parser.add_argument('--port', type=int, default=None, help='APIサーバーのポート番号')
+    parser.add_argument('--host', type=str, default=None, help='APIサーバーのホスト')
+    args = parser.parse_args()
+    
     print("🚀 Enhanced DeepResearch API Server Starting...")
     print("📡 管理者サイト連携API が起動します")
     print("🔗 エンドポイント:")
@@ -385,7 +393,10 @@ if __name__ == '__main__':
     print("   - POST /api/reports/generate    - レポート生成")
     print("   - POST /api/sales/upload        - 売上データアップロード")
     
-    port = settings.get('system', {}).get('api_port', 5001)
-    host = settings.get('system', {}).get('host', '127.0.0.1')
+    # 設定の優先順位: コマンドライン引数 > 設定ファイル > デフォルト値
+    port = args.port or settings.get('system', {}).get('api_port', 5001)
+    host = args.host or settings.get('system', {}).get('host', '127.0.0.1')
     debug = settings.get('system', {}).get('debug', True)
+    
+    print(f"🌐 サーバー起動: http://{host}:{port}")
     app.run(host=host, port=port, debug=debug) 
