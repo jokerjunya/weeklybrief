@@ -386,6 +386,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../config/environment.js"></script>
     <script src="./assets/admin.js"></script>
     <script src="./assets/api-test.js"></script>
     <script src="./assets/integration-test.js"></script>
@@ -393,18 +394,62 @@
     <!-- Initialize Admin App -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            window.adminApp = new AdminReportManager();
-            window.adminApp.init();
+            try {
+                // デバッグ情報表示
+                console.log('🚀 Admin App Initialization Starting...');
+                console.log('Environment loaded:', typeof window.currentConfig !== 'undefined');
+                console.log('AdminReportManager available:', typeof AdminReportManager !== 'undefined');
+                
+                // 管理者アプリ初期化
+                if (typeof AdminReportManager !== 'undefined') {
+                    window.adminApp = new AdminReportManager();
+                    window.adminApp.init();
+                    console.log('✅ Admin App initialized successfully');
+                } else {
+                    console.error('❌ AdminReportManager class not found');
+                    showInitializationError('AdminReportManager クラスが見つかりません');
+                }
+            } catch (error) {
+                console.error('❌ Admin App initialization failed:', error);
+                showInitializationError(error.message);
+            }
         });
         
-        // Update last update time
-        document.getElementById('lastUpdateTime').textContent = new Date().toLocaleDateString('ja-JP', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        // エラー表示関数
+        function showInitializationError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+                <div style="position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-width: 400px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">🚨 初期化エラー</div>
+                    <div style="font-size: 0.875rem;">${message}</div>
+                    <div style="font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.9;">F12 キーでコンソールを確認してください</div>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+            
+            // 5秒後に自動削除
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
+        
+        // 最終更新時刻の更新
+        try {
+            const lastUpdateElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = new Date().toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        } catch (error) {
+            console.error('Failed to update last update time:', error);
+        }
     </script>
 </body>
 </html> 
