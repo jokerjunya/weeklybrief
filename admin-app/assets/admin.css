@@ -1461,4 +1461,58 @@ body {
   color: var(--text-tertiary);
   margin-left: 0.5rem;
   font-family: monospace;
+}
+
+/* ===== 全ボタンの統一ホバー効果 ===== */
+/* 主要アクションボタン（青） */
+.btn-primary:hover,
+#analyzeNewsBtn:hover,
+#generateReportBtn:hover,
+button[type="submit"]:hover {
+  background: #5b56f0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 成功ボタン（緑） */
+.btn-success:hover,
+#publishReportBtn:hover {
+  background: #059669 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 危険ボタン（赤） */
+.btn-danger:hover {
+  background: #dc2626 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* アウトラインボタン（白・グレー） */
+.btn-outline:hover,
+#previewReportBtn:hover,
+.file-select-btn:hover {
+  background: #e5e7eb !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* ボタンのフォーカス状態 */
+.btn:focus {
+  outline: 2px solid var(--admin-primary);
+  outline-offset: 2px;
+}
+
+/* ボタンの無効状態 */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 } 
